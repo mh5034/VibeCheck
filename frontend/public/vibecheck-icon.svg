@@ -1,0 +1,17 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>VibeCheck icon</title>
+<desc>A speech bubble icon with a smiling face</desc>
+<defs>
+<linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#a855f7"/>
+<stop offset="100%" stop-color="#7c3aed"/>
+</linearGradient>
+</defs>
+
+<g transform="translate(20,15)">
+<path d="M10,10 h140 a20,20 0 0 1 20,20 v90 a20,20 0 0 1 -20,20 h-90 l-30,30 v-30 h-20 a20,20 0 0 1 -20,-20 v-90 a20,20 0 0 1 20,-20 z" fill="url(#bubbleGrad)"/>
+<circle cx="55" cy="75" r="7" fill="#ffffff"/>
+<circle cx="125" cy="75" r="7" fill="#ffffff"/>
+<path d="M50,105 q40,35 80,0" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+</g>
+</svg>

@@ -60,9 +60,6 @@ export default function Topic() {
           : prev,
       );
       setNewPost("");
-
-      // Reload to get update AI summary
-      await loadTopic();
     } catch (e: any) {
       setError(e.response?.data?.detail || "Failed to post");
     } finally {

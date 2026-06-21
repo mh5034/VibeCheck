@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY")) 
-MODEL = "llama3-8b-8192" 
+MODEL = "openai/gpt-oss-20b" 
 
 def get_sentiment(text: str) -> float:
     """
@@ -48,8 +48,8 @@ def get_sentiment(text: str) -> float:
 
         return score
     
-    except:
-        print(f"❌ AI sentiment FAILED: {type(e).__name__}: {e}")  # DEBUG
+    except Exception as e:
+        print(f"❌ AI sentiment FAILED: {type(e).__name__}: {repr(e)}")  # DEBUG
         return 50.0     # default neutral if AI fails
     
 def get_topic_summary(posts: list[str]) -> dict:

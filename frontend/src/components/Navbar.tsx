@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/vibecheck-logo.svg";
 
 export default function Navbar() {
   const { isLoggedIn, logout } = useAuth();
@@ -11,9 +12,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-10">
       <Link to="/" className="text-xl font-bold text-purple-400">
-        VibeCheck ✨
+        <img src={logo} alt="VibeCheck" className="h-10 w-auto" />
       </Link>
       <div className="flex gap-4 items-center">
         {isLoggedIn ? (

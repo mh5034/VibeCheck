@@ -40,18 +40,19 @@ export default function () {
     <div className="min-h-screen bg-gray-950 px-4 py-8">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Whats the vibe? ✨
+        <div className="mb-8 text-center mt-30">
+          <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
+            What's the vibe?
           </h1>
-          <p className="text-gray-400">
-            See what the community thinks about anything
+          <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+            See what the community thinks about anything. Create topics, drop
+            your thoughts, and track the internet's pulse in real-time.
           </p>
         </div>
 
         {/* Create Topic */}
         {isLoggedIn && (
-          <div className="flex gap2 mb-8">
+          <div className="flex gap-2 mb-8">
             <input
               value={newTopic}
               onChange={(e) => setNewTopic(e.target.value)}
