@@ -20,6 +20,9 @@ class Topic(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
     
+    ai_summary = Column(String, nullable=True)
+    ai_vibe_score = Column(String, nullable=True)
+    
     posts = relationship("Post", back_populates="topic")
     
 class Post(Base):

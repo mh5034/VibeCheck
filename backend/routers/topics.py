@@ -4,7 +4,7 @@ import schemas, models
 from sqlalchemy import func
 from database import get_db
 from auth import get_current_user
-from ai import get_topic_summary, get_sentiment
+from ai import get_sentiment, get_topic_summary
 
 router = APIRouter(prefix="/topics", tags=["topics"])
 
@@ -34,7 +34,6 @@ def get_topics(db: Session = Depends(get_db)):
 def create_topic(
     request: schemas.TopicCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
 ):
     # Check if topic already exists
     existing = db.query(models.Topic)\
@@ -72,21 +71,11 @@ def get_topic_posts(topic_id: int, db: Session = Depends(get_db)):
                 .limit(20)\
                     .all()
                     
-    # Get AI summary if there are posts
-    summary = None
-    vibe_score = None
-    
-    if posts:
-        post_contents = [p.content for p in posts]
-        ai_result = get_topic_summary(post_contents)
-        summary = ai_result["summary"]
-        vibe_score = ai_result["score"]
-    
     return schemas.TopicDetailResponse(
         id=topic.id,
         name=topic.name,
-        vibe_score=vibe_score,
-        summary=summary,
+        vibe_score=topic.ai_vibe_score,
+        summary=topic.ai_summary,
         posts=[schemas.PostResponse(
             id=p.id,
             content=p.content,
@@ -105,14 +94,12 @@ def create_post(
 ):
     
     # Check topic exists
-    
     topic = db.query(models.Topic).filter(models.Topic.id == topic_id).first()
     
     if not topic:
         raise HTTPException(status_code=404, detail="Topic not found")    
     
     # Get sentiment score for this post
-    
     sentiment = get_sentiment(request.content)
     
     post = models.Post(
@@ -125,6 +112,19 @@ def create_post(
     db.add(post)
     db.commit()
     db.refresh(post)
+    
+    recent_posts = db.query(models.Post)\
+        .filter(models.Post.topic_id == topic_id)\
+            .order_by(models.Post.created_at.desc())\
+                .limit(20)\
+                    .all()
+                    
+    ai_result = get_topic_summary([p.content for p in recent_posts])
+    
+    topic.ai_summary = ai_result["summary"]
+    topic.ai_vibe_score = ai_result["score"]
+    
+    db.commit()
     
     return post
 

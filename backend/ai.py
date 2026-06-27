@@ -16,7 +16,6 @@ def get_sentiment(text: str) -> float:
     """
     
     try:
-        print(f"🔍 Analyzing sentiment for: {text}")   # DEBUG
         response = client.chat.completions.create(
             model=MODEL,
             max_tokens = 100,
@@ -40,56 +39,55 @@ def get_sentiment(text: str) -> float:
             
         )
         raw_content = response.choices[0].message.content
-        print(f"🤖 Raw AI response: {raw_content}")     # DEBUG
-
         result = json.loads(raw_content)
         score = float(result["score"])
-        print(f"✅ Parsed score: {score}")               # DEBUG
 
         return score
     
-    except Exception as e:
-        print(f"❌ AI sentiment FAILED: {type(e).__name__}: {repr(e)}")  # DEBUG
+    except:
         return 50.0     # default neutral if AI fails
     
-def get_topic_summary(posts: list[str]) -> dict:
-    """
-    Return AI summary and vibe score for a topic
-    based on its recent posts. 
-    """
-    
+def get_topic_summary(posts: list[str], retries: int = 2) -> dict:
     if not posts:
         return {"summary": None, "score": None}
-    
-    try:
-        posts_text = "\n".join([f"- {p}" for p in posts])
-        
-        response = client.chat.completions.create(
-            model=MODEL,
-            max_tokens=200,
-            response_format={"type": "json_object"}, 
-            messages = [
-                {
-                    "role": "system",
-                    "content": f"""Here are recent community vibes about a topic:
-                    
-                    {posts_text}
-                    
-                    
-                    Return ONLY a JSON object with:
-                    - "summary": 2 sentence summary of the community mood
-                    - "score": overall vibe score 0-100
-                    
-                    Example: {{"summary": "People are mostly positive. A few concerns about price.", "score": 65}}"""                    
-                }
-            ]
-        )
-        
-        result = json.loads(response.choices[0].message.content)
-        return {"summary": result["summary"], "score": float(result["score"])}
-    
-    
-    except Exception:
-        return {"summary": None, "score": None}
-        
-    
+
+    posts_text = "\n".join([f"- {p}" for p in posts])
+
+    for attempt in range(retries + 1):
+        try:
+            response = client.chat.completions.create(
+                model=MODEL,
+                max_tokens=300,
+                response_format={"type": "json_object"},
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a community mood analyzer. Always respond with valid JSON only, no explanation."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Here are recent community vibes about a topic:
+
+{posts_text}
+
+Return ONLY a JSON object with:
+- "summary": a 2 sentence summary of the community mood
+- "score": overall vibe score from 0 to 100
+
+Example: {{"summary": "People are mostly positive. A few concerns about price.", "score": 65}}"""
+                    }
+                ]
+            )
+
+            raw_content = response.choices[0].message.content
+            print(f"🤖 Raw topic summary response (attempt {attempt + 1}): {raw_content}")
+
+            result = json.loads(raw_content)
+            return {"summary": result["summary"], "score": float(result["score"])}
+
+        except Exception as e:
+            print(f"❌ AI topic summary FAILED (attempt {attempt + 1}): {type(e).__name__}: {e}")
+            continue   # try again
+
+    # All retries failed
+    return {"summary": None, "score": None}
