@@ -18,12 +18,20 @@ export default function Navbar() {
       </Link>
       <div className="flex gap-4 items-center">
         {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm"
-          >
-            Logout
-          </button>
+          <div className="flex gap-3 items-center">
+            <Link
+              to="/dashboard"
+              className="text-gray-300 hover:text-white text-sm"
+            >
+              My Vibes
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm"
+            >
+              Logout
+            </button>
+          </div>
         ) : (
           <Link
             to="/auth"

@@ -52,3 +52,20 @@ class PostResponse(BaseModel):
     
     class Config:
         from_attributes = True
+        
+# Dashboard
+class DashboardPost(BaseModel):
+    id: int
+    content: str
+    sentiment_score: Optional[float] = None
+    topic_name: str
+    created_at: datetime
+    
+    class Config: 
+        from_attributes = True
+        
+class DashboardResponse(BaseModel):
+    email: str
+    total_posts: int
+    avg_sentiment: Optional[float] = None
+    posts: list[DashboardPost] = []

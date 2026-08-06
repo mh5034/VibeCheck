@@ -41,6 +41,21 @@ export type TopicDetail = {
   posts: Post[];
 };
 
+export type DashboardPost = {
+  id: number;
+  content: string;
+  sentiment_score: number | null;
+  topic_name: string;
+  created_at: string;
+};
+
+export type Dashboard = {
+  email: string;
+  total_posts: number;
+  avg_sentiment: number | null;
+  posts: DashboardPost[];
+};
+
 // Auth
 export const register = async (email: string, password: string) => {
   const res = await api.post("/auth/register", { email, password });
@@ -74,6 +89,12 @@ export const createPost = async (
   content: string,
 ): Promise<Post> => {
   const res = await api.post(`topics/${topicId}/posts`, { content });
+  return res.data;
+};
+
+// Dashboard
+export const getDashboard = async (): Promise<Dashboard> => {
+  const res = await api.get("/users/me");
   return res.data;
 };
 
