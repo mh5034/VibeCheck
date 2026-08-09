@@ -92,6 +92,11 @@ export const createPost = async (
   return res.data;
 };
 
+export const deletePost = async (postId: number): Promise<void> => {
+  const res = await api.delete(`topics/posts/${postId}`);
+  return res.data;
+};
+
 // Dashboard
 export const getDashboard = async (): Promise<Dashboard> => {
   const res = await api.get("/users/me");

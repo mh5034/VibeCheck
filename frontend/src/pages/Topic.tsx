@@ -67,6 +67,16 @@ export default function Topic() {
     }
   }
 
+  const handleDeletePost = (postId: number) => {
+    setTopic((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        posts: prev.posts.filter((p) => p.id !== postId),
+      };
+    });
+  };
+
   if (loading)
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center text-gray-400">
@@ -169,7 +179,9 @@ export default function Topic() {
               No vibes yet — be the first! 👆
             </div>
           ) : (
-            topic.posts.map((post) => <PostCard key={post.id} post={post} />)
+            topic.posts.map((post) => (
+              <PostCard key={post.id} post={post} onDelete={handleDeletePost} />
+            ))
           )}
         </div>
       </div>

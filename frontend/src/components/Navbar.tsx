@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/vibecheck-logo.svg";
+import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const { isLoggedIn, logout } = useAuth();
@@ -25,12 +26,12 @@ export default function Navbar() {
             >
               My Vibes
             </Link>
-            <button
+            <Button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm"
+              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm"
             >
               Logout
-            </button>
+            </Button>
           </div>
         ) : (
           <Link

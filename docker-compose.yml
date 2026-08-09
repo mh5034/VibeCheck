@@ -23,8 +23,8 @@ services:
     restart: always
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://postgres.uvznxhdvevspppbpscgi:hO3EttVjeDuoTrd8@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require
+    # environment:
+    #   - DATABASE_URL=postgresql://postgres.uvznxhdvevspppbpscgi:hO3EttVjeDuoTrd8@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require
     env_file:
       - ./backend/.env
     # depends_on:

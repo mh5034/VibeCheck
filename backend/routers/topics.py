@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import schemas, models
 from sqlalchemy import func
@@ -14,16 +14,11 @@ def get_topics(db: Session = Depends(get_db)):
     topics = db.query(models.Topic).all()
     
     result = []
-    for topic in topics:
-        # Average sentiment score of all posts in topic
-        avg_score = db.query(func.avg(models.Post.sentiment_score))\
-        .filter(models.Post.topic_id == topic.id)\
-        .scalar()
-        
+    for topic in topics:        
         result.append(schemas.TopicResponse(
             id=topic.id,
             name=topic.name,
-            vibe_score=round(avg_score, 1) if avg_score else None,
+            vibe_score=topic.ai_vibe_score,
             post_count=len(topic.posts)
         ))
         
@@ -127,6 +122,52 @@ def create_post(
     db.commit()
     
     return post
+
+# Delete Post
+@router.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post.user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized to delete this post"
+        )
+        
+    topic_id = post.topic_id
+        
+    db.delete(post)
+    db.commit()
+    
+    topic = db.query(models.Topic).filter(models.Topic.id == topic_id).first()
+    
+    remaining_posts = db.query(models.Post)\
+        .filter(models.Post.topic_id == topic_id)\
+            .order_by(models.Post.created_at.desc())\
+                .limit(20)\
+                    .all()
+                    
+    if remaining_posts:
+        ai_result = get_topic_summary([p.content for p in remaining_posts])
+        topic.ai_summary = ai_result["summary"]
+        topic.ai_vibe_score = ai_result["score"]
+        
+    else:
+        topic.ai_summary = None
+        topic.ai_vibe_score = None
+        
+    db.commit()
+    
+    return None
+        
+    
 
     
     
