@@ -24,11 +24,11 @@ function getSentimentEmoji(score: number | null) {
   return "😞";
 }
 
-// Removed the top-level post prop requirement since this page fetches its own dashboard
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [loading, setLoading] = useState(true);
-  const { isLoggedIn } = useAuth();
+  const [expired, setExpired] = useState(false);
+  const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
   // Track the specific post targeted for deletion
@@ -66,6 +66,12 @@ export default function DashboardPage() {
     }
     getDashboard()
       .then(setDashboard)
+      .catch((err) => {
+        if (err.response?.status == 401) {
+          setExpired(true); // catch expired token
+          logout(); // clear auth state
+        }
+      })
       .finally(() => setLoading(false));
   }, [isLoggedIn, navigate]);
 
@@ -83,18 +89,18 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gray-950 px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {/* Header Banner */}
-          <div className="bg-gray-800 rounded-2xl p-6 mb-6">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
             <h1 className="text-white text-2xl font-bold mb-4">My Dashboard</h1>
 
             {/* Stats Metrics Grid */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-700 rounded-xl p-4 text-center">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
                 <p className="text-3xl font-bold text-white">
                   {dashboard.total_posts}
                 </p>
                 <p className="text-gray-400 text-sm mt-1">Total Vibes</p>
               </div>
-              <div className="bg-gray-700 rounded-xl p-4 text-center">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
                 <p className="text-3xl font-bold text-purple-400">
                   {dashboard.avg_sentiment ?? "N/A"}
                 </p>
@@ -115,7 +121,7 @@ export default function DashboardPage() {
               dashboard.posts.map((postItem) => (
                 <div
                   key={postItem.id}
-                  className="bg-gray-800 rounded-xl p-4 flex gap-3"
+                  className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex gap-3"
                 >
                   <span className="text-2xl">
                     {getSentimentEmoji(postItem.sentiment_score)}

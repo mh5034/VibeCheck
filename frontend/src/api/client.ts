@@ -17,6 +17,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor to catch 401 globally
+api.interceptors.response.use(
+  response => response, //success
+  error => {
+    if (error.response?.token === 401){
+      // token exprired or invalid
+      localStorage.removeItem("token")
+      window.location.href = "/auth"
+    }
+    return Promise.reject(error)
+  }
+)
+
 // Types
 
 export type Topic = {

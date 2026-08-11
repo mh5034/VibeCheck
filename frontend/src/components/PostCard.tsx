@@ -43,7 +43,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
   };
   return (
     <>
-      <div className="bg-gray-800 rounded-xl p-4 flex gap-3">
+      <div className="flex gap-3 w-full p-4 rounded-xl bg-slate-900 border border-slate-800">
         <span className="text-2xl">
           {getSentimentEmoji(post.sentiment_score)}
         </span>
@@ -52,7 +52,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
             <p className="text-white">{post.content}</p>
             <button
               onClick={() => setShowDialog(true)}
-              className="text-gray-500 hover:text-red-400 text-xs transition-colors duration-200"
+              className="text-gray-500 hover:text-red-400 text-xs transition-colors duration-200 ml-2"
             >
               Delete
             </button>
@@ -72,7 +72,8 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
 
       {/* Confirm Delete Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-gray-800 border-gray-700">
+        <DialogContent className="bg-slate-900 border border-slate-800">
+          {/* w-full p-5 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80 */}
           <DialogHeader>
             <DialogTitle className="text-white">Delete this vibe?</DialogTitle>
             <DialogDescription className="text-gray-400">
@@ -87,18 +88,18 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
 
-          <DialogFooter className="gap-2 bg-gray-800 border-gray-700">
+          <DialogFooter className="bg-slate-950 border border-slate-900">
             <Button
               variant="outline"
               onClick={() => setShowDialog(false)}
               disabled={deleting}
-              className="text-slate-900 dark:text-slate-100 border-gray-600 hover:bg-gray-700"
+              className="text-slate-900 dark:text-slate-100 border-gray-600 px-4 py-2 rounded-lg transition-colors duration-200 hover:bg-gray-300 active:bg-gray-500"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 hover:bg-red-500 active:bg-red-700"
               onClick={handleDelete}
               disabled={deleting}
             >

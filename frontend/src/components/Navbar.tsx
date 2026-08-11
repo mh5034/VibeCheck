@@ -18,28 +18,31 @@ export default function Navbar() {
         <img src={logo} alt="VibeCheck" className="h-10 w-auto" />
       </Link>
       <div className="flex gap-4 items-center">
+        <button
+          onClick={() =>
+            isLoggedIn ? navigate("/dashboard") : navigate("/auth")
+          }
+          className="text-gray-300 hover:text-white text-sm"
+        >
+          My Vibes
+        </button>
+
         {isLoggedIn ? (
           <div className="flex gap-3 items-center">
-            <Link
-              to="/dashboard"
-              className="text-gray-300 hover:text-white text-sm"
-            >
-              My Vibes
-            </Link>
             <Button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm"
+              className="bg-red-950/40 text-red-400 border border-red-900/50 hover:bg-red-600 hover:text-white active:bg-red-700 px-4 py-2 rounded-lg text-sm transition-all duration-200"
             >
               Logout
             </Button>
           </div>
         ) : (
-          <Link
-            to="/auth"
-            className="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-lg text-sm"
+          <Button
+            render={<Link to="/auth" />}
+            className="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 px-4 py-2 rounded-lg text-sm"
           >
             Login
-          </Link>
+          </Button>
         )}
       </div>
     </nav>

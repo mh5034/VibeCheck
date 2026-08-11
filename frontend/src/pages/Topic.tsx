@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { createPost, getTopicPosts, type TopicDetail } from "../api/client";
@@ -21,7 +21,7 @@ function VibeBar({ score }: { score: number | null }) {
 export default function Topic() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const [topic, setTopic] = useState<TopicDetail | null>();
   const [newPost, setNewPost] = useState("");
   const [loading, setLoading] = useState(true);
@@ -38,7 +38,11 @@ export default function Topic() {
     try {
       const data = await getTopicPosts(Number(id));
       setTopic(data);
-    } catch {
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        logout(); // logout if token expired
+        navigate("/auth"); // redirect to auth page
+      }
       setError("Failed to load topic");
     } finally {
       setLoading(false);
@@ -103,9 +107,8 @@ export default function Topic() {
         </button>
 
         {/* Topic Header */}
-        <div className="bg-gray-800 rounded-2xl p-6 mb-6">
+        <div className="w-full rounded-xl bg-slate-900 border border-slate-800 p-6 mb-6">
           <h1 className="text-white text-2xl font-bold mb-1">#{topic.name}</h1>
-
           {/* Vibe Score */}
           {topic.vibe_score !== null && (
             <div className="mt-3">
@@ -118,7 +121,6 @@ export default function Topic() {
               <VibeBar score={topic.vibe_score} />
             </div>
           )}
-
           {/* AI Summary */}
           {topic.summary && (
             <div className="mt-4 bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
@@ -132,37 +134,40 @@ export default function Topic() {
 
         {/* Post Input */}
         {isLoggedIn ? (
-          <div className="bg-gray-800 rounded-2xl p-4 mb-6">
+          <div className="flex flex-col gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4 mb-6 transition-all focus-within:ring-2 focus-within:ring-purple-500">
             <textarea
               value={newPost}
               onChange={(e) => setNewPost(e.target.value.slice(0, charLimit))}
               placeholder="What's your vibe on this?"
               rows={3}
-              className="w-full bg-transparent text-white outline-none resize-none placeholder-gray-500"
+              className="w-full bg-transparent text-slate-100 outline-none resize-none placeholder-slate-500 text-sm leading-relaxed"
             />
 
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-gray-500 text-xs">
+            <div className="flex justify-between items-center mt-1 pt-2 border-t border-slate-800/40">
+              <span className="text-slate-500 text-xs font-medium">
                 {newPost.length}/{charLimit}
               </span>
               <button
                 onClick={handlePost}
                 disabled={posting || !newPost.trim()}
-                className="bg-purple-500 hover:bg-purple-600 disabledopacity-50 text-white px-5 py-2 rounded-lg text-sm font-semibold transition"
+                className="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 disabled:opacity-40 disabled:pointer-events-none text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-md shadow-purple-950/10"
               >
                 {posting ? "Posting..." : "Post Vibe"}
               </button>
             </div>
           </div>
         ) : (
-          <div className="bg-gray-800 rounded-2xl p-4 mb-6 text-center">
-            <p className="text-gray-400 text-sm">
-              <a href="/auth" className="text-purple-400 hover:underline">
+          <Link
+            to="/auth"
+            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80 group mb-6"
+          >
+            <span className="text-slate-400">
+              <span className="text-purple-500 font-semibold group-hover:underline">
                 Login
-              </a>{" "}
+              </span>{" "}
               to post your vibe
-            </p>
-          </div>
+            </span>
+          </Link>
         )}
 
         {/* Error */}

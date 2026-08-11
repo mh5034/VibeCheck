@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { type Topic, createTopic, getTopics } from "../api/client.ts";
 import { useAuth } from "../context/AuthContext.tsx";
 import TopicCard from "../components/TopicCard";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function () {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -9,6 +10,7 @@ export default function () {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadTopics();
@@ -26,6 +28,10 @@ export default function () {
   }
 
   async function handleCreateTopic() {
+    if (!isLoggedIn) {
+      navigate("/auth");
+      return;
+    }
     if (!newTopic.trim()) return;
     try {
       const topic = await createTopic(newTopic.trim());
@@ -51,22 +57,34 @@ export default function () {
         </div>
 
         {/* Create Topic */}
-        {isLoggedIn && (
+        {isLoggedIn ? (
           <div className="flex gap-2 mb-8">
             <input
               value={newTopic}
               onChange={(e) => setNewTopic(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreateTopic()}
               placeholder="Start a new topic..."
-              className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 bg-slate-900 border border-slate-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button
               onClick={handleCreateTopic}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold transition"
+              className="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition"
             >
               Add
             </button>
           </div>
+        ) : (
+          <Link
+            to="/auth"
+            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80 group mb-6"
+          >
+            <span className="text-slate-400">
+              <span className="text-purple-500 font-semibold group-hover:underline">
+                Login
+              </span>{" "}
+              to create a topic
+            </span>
+          </Link>
         )}
 
         {/* Error */}

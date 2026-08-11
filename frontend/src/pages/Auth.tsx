@@ -31,7 +31,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-md">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md">
         <h1 className="text-white text-2xl font-bold text-center mb-6">
           {isLogin ? "Welcome back 👋" : "Join VibeCheck ✨"}
         </h1>
@@ -48,27 +48,27 @@ export default function Auth() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
+            className="bg-slate-900 border border-slate-800 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
           />
           <input
             type="password"
-            placeholder="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key == "Enter" && handleSubmit()}
-            className="bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
+            className="bg-slate-900 border border-slate-800 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
           />
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition"
+            className="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition"
           >
             {loading ? "Loading..." : isLogin ? "Login" : "Register"}
           </button>
         </div>
 
         <p className="text-gray-400 text-center mt-4 text-sm">
-          {isLogin ? "Don't have and account?" : "Already have an account?"}{" "}
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             onClick={() => setIsLogin(!isLogin)}
             className="text-purple-400 hover:underline"
