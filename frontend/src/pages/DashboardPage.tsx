@@ -27,7 +27,6 @@ function getSentimentEmoji(score: number | null) {
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [loading, setLoading] = useState(true);
-  const [expired, setExpired] = useState(false);
   const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -68,7 +67,6 @@ export default function DashboardPage() {
       .then(setDashboard)
       .catch((err) => {
         if (err.response?.status == 401) {
-          setExpired(true); // catch expired token
           logout(); // clear auth state
         }
       })
