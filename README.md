@@ -193,7 +193,7 @@ When topic page is opened:
 **Mohammad Hadi Elabed**
 
 - LinkedIn: [linkedin.com/in/mohammad-hadi-elabed](https://linkedin.com/in/mohammad-hadi-elabed)
-- GitHub: [github.com/yourusername](https://github.com/MH5034)
+- GitHub: [github.com/mh5034](https://github.com/MH5034)
 
 ---
 
