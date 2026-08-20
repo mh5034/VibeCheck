@@ -68,6 +68,7 @@ export default function DashboardPage() {
       .catch((err) => {
         if (err.response?.status == 401) {
           logout(); // clear auth state
+          navigate("/auth");
         }
       })
       .finally(() => setLoading(false));
@@ -132,7 +133,7 @@ export default function DashboardPage() {
                       <p className="text-white text-sm">{postItem.content}</p>
                       <button
                         onClick={() => setActiveDeletePost(postItem)}
-                        className="text-gray-500 hover:text-red-400 text-xs transition-colors duration-200"
+                        className="text-gray-500 hover:text-red-400 text-xs transition-colors duration-200 ml-2"
                       >
                         Delete
                       </button>
