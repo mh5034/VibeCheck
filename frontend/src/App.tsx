@@ -11,6 +11,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Navbar />
+        {/* App Routes */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/topic/:id" element={<Topic />} />
