@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type Errors = {
   email?: string;
@@ -18,6 +18,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/"; // default to home if no previous location
 
   function validate(): boolean {
     const newErrors: Errors = {};
@@ -60,7 +62,7 @@ export default function Auth() {
       } else {
         await register(email, password);
       }
-      navigate("/");
+      navigate(from, { replace: true }); // go back to the previous page after successful login/register
     } catch (e: any) {
       // display backend error
       const detail = e.response?.data?.detail;

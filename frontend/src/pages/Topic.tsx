@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { createPost, getTopicPosts, type TopicDetail } from "../api/client";
@@ -19,6 +19,7 @@ function VibeBar({ score }: { score: number | null }) {
 }
 
 export default function Topic() {
+  const location = useLocation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn, logout } = useAuth();
@@ -159,6 +160,7 @@ export default function Topic() {
         ) : (
           <Link
             to="/auth"
+            state={{ from: location }}
             className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80 group mb-6"
           >
             <span className="text-slate-400">
