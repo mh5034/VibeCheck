@@ -7,10 +7,15 @@ import { Link, useNavigate } from "react-router-dom";
 export default function () {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [newTopic, setNewTopic] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredTopics = topics.filter((topic) =>
+    topic.name.toLowerCase().includes(normalizedQuery),
+  );
 
   useEffect(() => {
     loadTopics();
@@ -81,7 +86,7 @@ export default function () {
             <span className="text-slate-400">
               <span className="text-purple-500 font-semibold group-hover:underline">
                 Login
-              </span>{" "}
+              </span>
               to create a topic
             </span>
           </Link>
@@ -94,20 +99,67 @@ export default function () {
           </div>
         )}
 
+        {/* Search Topics */}
+        <div role="search" className="mb-6">
+          <label
+            htmlFor="topic-search"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
+            Search topics
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="topic-search"
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSearchQuery("");
+              }}
+              placeholder="Search by topic name..."
+              aria-controls="topic-results"
+              className="min-w-0 flex-1 bg-slate-900 border border-slate-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="text-gray-300 hover:text-white bg-slate-800 rounded-xl px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                aria-label="Clear topic search"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p role="status" className="text-sm text-gray-400 mt-2">
+            {!loading &&
+              normalizedQuery &&
+              `${filteredTopics.length} ${filteredTopics.length === 1 ? "topic" : "topics"} found`}
+          </p>
+        </div>
+
         {/* Topics List */}
-        {loading ? (
-          <div className="text-center text-gray-400 py-20">Loading...</div>
-        ) : topics.length === 0 ? (
-          <div className="text-center text-gray-400 py-20">
-            No topics yet — create one! 👆
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {topics.map((topic) => (
-              <TopicCard key={topic.id} topic={topic} />
-            ))}
-          </div>
-        )}
+        <div id="topic-results" aria-busy={loading}>
+          {loading ? (
+            <div className="text-center text-gray-400 py-20">Loading...</div>
+          ) : topics.length === 0 ? (
+            <div className="text-center text-gray-400 py-20">
+              No topics yet — create one! 👆
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filteredTopics.length === 0 && (
+                <div className="text-center text-gray-400 py-20">
+                  No topics match &quot;{searchQuery.trim()}&quot;. Try another
+                  search.
+                </div>
+              )}
+              {filteredTopics.map((topic) => (
+                <TopicCard key={topic.id} topic={topic} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
