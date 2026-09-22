@@ -100,7 +100,7 @@ export default function Topic() {
       <div className="max-w-2xl mx-auto">
         {/* Back button */}
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="text-gray-400 hover:text-white mb-6 flex items-center gap-2"
         >
           ← Back

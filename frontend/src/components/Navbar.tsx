@@ -19,6 +19,12 @@ export default function Navbar() {
       </Link>
       <div className="flex gap-4 items-center">
         <button
+          onClick={() => navigate("/topics")}
+          className="text-gray-300 hover:text-white text-sm"
+        >
+          Topics
+        </button>
+        <button
           onClick={() =>
             isLoggedIn ? navigate("/dashboard") : navigate("/auth")
           }

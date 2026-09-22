@@ -18,20 +18,24 @@ function getVibeEmoji(score: number | null) {
 export default function TopicCard({ topic }: { topic: Topic }) {
   return (
     <Link to={`/topic/${topic.id}`}>
-      <div className="w-full p-5 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80">
+      <div className="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80">
         <div className="flex justify-between items-center">
-          <h2 className="text-white font-semibold text-lg">#{topic.name}</h2>
-          <span className="text-2xl">{getVibeEmoji(topic.vibe_score)}</span>
+          <h2 className="text-white font-semibold text-lg ml-1">
+            #{topic.name}
+          </h2>
+          <span className="text-2xl mr-1">
+            {getVibeEmoji(topic.vibe_score)}
+          </span>
         </div>
         <div className="mt-2 flex justify-between items-center">
-          <span className="text-gray-400 text-sm">
+          <span className="text-gray-400 text-sm ml-1">
             {topic.post_count} vibes
           </span>
           <span
-            className={`font-bold text-sm ${getVibeColor(topic.vibe_score)}`}
+            className={`font-bold text-sm mr-1 ${getVibeColor(topic.vibe_score)}`}
           >
             {topic.vibe_score !== null
-              ? `${topic.vibe_score}/100`
+              ? `Vibe score: ${topic.vibe_score}/100`
               : `No vibes yet`}
           </span>
         </div>

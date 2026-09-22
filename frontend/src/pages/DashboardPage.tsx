@@ -87,6 +87,12 @@ export default function DashboardPage() {
     <>
       <div className="min-h-screen bg-gray-950 px-4 py-8">
         <div className="max-w-2xl mx-auto">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-gray-400 hover:text-white mb-6 flex items-center gap-2"
+          >
+            ← Back
+          </button>
           {/* Header Banner */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
             <h1 className="text-white text-2xl font-bold mb-4">My Dashboard</h1>

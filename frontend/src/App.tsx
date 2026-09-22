@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Topic from "./pages/Topic";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/DashboardPage";
+import Topics from "./pages/TopicsPage";
 
 export default function App() {
   return (
@@ -28,9 +29,8 @@ function AppContent() {
         <Route path="/topic/:id" element={<Topic />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/topics" element={<Topics />} />
       </Routes>
     </>
   );
 }
-
-
