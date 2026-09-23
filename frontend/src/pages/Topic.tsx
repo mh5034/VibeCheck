@@ -1,7 +1,9 @@
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useEffect, useState } from "react";
-import { createPost, getTopicPosts, type TopicDetail } from "../api/client";
+import { useState } from "react";
+import { isAxiosError } from "axios";
+import { createPost, getTopicResource } from "../api/client";
+import { useResource } from "../hooks/useResource";
 import PostCard from "../components/PostCard";
 
 function VibeBar({ score }: { score: number | null }) {
@@ -22,65 +24,36 @@ export default function Topic() {
   const location = useLocation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isLoggedIn, logout } = useAuth();
-  const [topic, setTopic] = useState<TopicDetail | null>();
+  const { isLoggedIn } = useAuth();
+  const {
+    data: topic,
+    loading,
+    error: loadError,
+    retry,
+  } = useResource(getTopicResource(Number(id)));
   const [newPost, setNewPost] = useState("");
-  const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState("");
   const charLimit = 280;
 
-  useEffect(() => {
-    if (!id) return;
-    loadTopic();
-  }, [id]);
-
-  async function loadTopic() {
-    try {
-      const data = await getTopicPosts(Number(id));
-      setTopic(data);
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        logout(); // logout if token expired
-        navigate("/auth"); // redirect to auth page
-      }
-      setError("Failed to load topic");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function handlePost() {
-    if (!newPost.trim() || !id) return;
+    if (!newPost.trim() || !id || posting) return;
     setPosting(true);
+    setError("");
 
     try {
-      const post = await createPost(Number(id), newPost.trim());
-      setTopic((prev) =>
-        prev
-          ? {
-              ...prev,
-              posts: [post, ...prev.posts],
-            }
-          : prev,
-      );
+      await createPost(Number(id), newPost.trim());
       setNewPost("");
-    } catch (e: any) {
-      setError(e.response?.data?.detail || "Failed to post");
+    } catch (e: unknown) {
+      setError(
+        isAxiosError(e)
+          ? e.response?.data?.detail || "Failed to post"
+          : "Failed to post",
+      );
     } finally {
       setPosting(false);
     }
   }
-
-  const handleDeletePost = (postId: number) => {
-    setTopic((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        posts: prev.posts.filter((p) => p.id !== postId),
-      };
-    });
-  };
 
   if (loading)
     return (
@@ -92,7 +65,14 @@ export default function Topic() {
   if (!topic)
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center text-gray-400">
-        Topic not found
+        <div role="alert">
+          {isAxiosError(loadError) && loadError.response?.status === 404
+            ? "Topic not found"
+            : "Failed to load topic"}
+          <button onClick={retry} className="underline ml-2">
+            Retry
+          </button>
+        </div>
       </div>
     );
 
@@ -173,6 +153,14 @@ export default function Topic() {
         )}
 
         {/* Error */}
+        {!!loadError && (
+          <div role="alert" className="text-red-400 mb-4">
+            Could not refresh this topic.{" "}
+            <button onClick={retry} className="underline">
+              Retry
+            </button>
+          </div>
+        )}
         {error && (
           <div className="bg-red-500/20 text-red-400 rounded-lg p-3 mb-4 text-sm">
             {error}
@@ -187,7 +175,7 @@ export default function Topic() {
             </div>
           ) : (
             topic.posts.map((post) => (
-              <PostCard key={post.id} post={post} onDelete={handleDeletePost} />
+              <PostCard key={post.id} post={post} />
             ))
           )}
         </div>

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { createResource } from "./resource";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -86,8 +87,12 @@ export const getTopics = async (): Promise<Topic[]> => {
   return res.data;
 };
 
+export const topicsResource = createResource(getTopics);
+
 export const createTopic = async (name: string): Promise<Topic> => {
   const res = await api.post("/topics", { name });
+  topicsResource.update((topics) => [res.data, ...topics]);
+  topicsResource.invalidate();
   return res.data;
 };
 
@@ -97,17 +102,46 @@ export const getTopicPosts = async (topicId: number): Promise<TopicDetail> => {
   return res.data;
 };
 
+const topicResources = new Map<
+  number,
+  ReturnType<typeof createResource<TopicDetail>>
+>();
+
+export function getTopicResource(topicId: number) {
+  let resource = topicResources.get(topicId);
+  if (!resource) {
+    resource = createResource(() => getTopicPosts(topicId));
+    topicResources.set(topicId, resource);
+  }
+  return resource;
+}
+
 export const createPost = async (
   topicId: number,
   content: string,
 ): Promise<Post> => {
   const res = await api.post(`topics/${topicId}/posts`, { content });
+  const resource = getTopicResource(topicId);
+  resource.update((topic) => ({
+    ...topic,
+    posts: [res.data, ...topic.posts].slice(0, 20),
+  }));
+  resource.invalidate();
+  topicsResource.invalidate();
   return res.data;
 };
 
 export const deletePost = async (postId: number): Promise<void> => {
-  const res = await api.delete(`topics/posts/${postId}`);
-  return res.data;
+  await api.delete(`topics/posts/${postId}`);
+  // Dashboard deletion also updates any previously visited topic pages.
+  for (const resource of topicResources.values()) {
+    resource.update((topic) => ({
+      ...topic,
+      posts: topic.posts.filter((post) => post.id !== postId),
+    }));
+    resource.invalidate();
+  }
+  topicsResource.invalidate();
 };
 
 // Dashboard

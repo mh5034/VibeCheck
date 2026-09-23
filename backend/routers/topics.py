@@ -11,7 +11,19 @@ router = APIRouter(prefix="/topics", tags=["topics"])
 # Get all topics
 @router.get("", response_model=list[schemas.TopicResponse])
 def get_topics(db: Session = Depends(get_db)):
-    topics = db.query(models.Topic).all()
+    # Count in SQL instead of lazily loading every topic's entire post history.
+    topics = (
+        db.query(
+            models.Topic.id,
+            models.Topic.name,
+            models.Topic.ai_vibe_score,
+            func.count(models.Post.id).label("post_count"),
+        )
+        .outerjoin(models.Post, models.Post.topic_id == models.Topic.id)
+        .group_by(models.Topic.id, models.Topic.name, models.Topic.ai_vibe_score)
+        .order_by(models.Topic.id.desc())
+        .all()
+    )
     
     result = []
     for topic in topics:        
@@ -19,7 +31,7 @@ def get_topics(db: Session = Depends(get_db)):
             id=topic.id,
             name=topic.name,
             vibe_score=topic.ai_vibe_score,
-            post_count=len(topic.posts)
+            post_count=topic.post_count
         ))
         
     return result
@@ -58,11 +70,11 @@ def get_topic_posts(topic_id: int, db: Session = Depends(get_db)):
     topic = db.query(models.Topic).filter(models.Topic.id == topic_id).first()
     
     if not topic:
-        return HTTPException(status_code=404, detail="Topic not found")
+        raise HTTPException(status_code=404, detail="Topic not found")
     
     posts = db.query(models.Post)\
         .filter(models.Post.topic_id == topic_id)\
-            .order_by(models.Post.created_at.desc())\
+            .order_by(models.Post.created_at.desc(), models.Post.id.desc())\
                 .limit(20)\
                     .all()
                     
@@ -110,7 +122,7 @@ def create_post(
     
     recent_posts = db.query(models.Post)\
         .filter(models.Post.topic_id == topic_id)\
-            .order_by(models.Post.created_at.desc())\
+            .order_by(models.Post.created_at.desc(), models.Post.id.desc())\
                 .limit(20)\
                     .all()
                     
@@ -150,7 +162,7 @@ def delete_post(
     
     remaining_posts = db.query(models.Post)\
         .filter(models.Post.topic_id == topic_id)\
-            .order_by(models.Post.created_at.desc())\
+            .order_by(models.Post.created_at.desc(), models.Post.id.desc())\
                 .limit(20)\
                     .all()
                     
@@ -166,8 +178,3 @@ def delete_post(
     db.commit()
     
     return None
-        
-    
-
-    
-    

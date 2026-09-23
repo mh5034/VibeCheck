@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Index
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -35,7 +35,11 @@ class Post(Base):
     
     user_id = Column(Integer, ForeignKey("users.id"))
     topic_id = Column(Integer, ForeignKey("topics.id"))
-    
+
+    __table_args__ = (
+        Index("ix_posts_topic_recent", topic_id, created_at.desc(), id.desc()),
+        Index("ix_posts_user_recent", user_id, created_at.desc(), id.desc()),
+    )
+
     user = relationship("User", back_populates="posts")
     topic = relationship("Topic", back_populates="posts")
-    

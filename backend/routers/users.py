@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func 
 from database import get_db
 from auth import get_current_user
@@ -14,8 +14,9 @@ def get_dashboard(
     current_user: models.User = Depends(get_current_user)
 ):
     posts = db.query(models.Post)\
+        .options(joinedload(models.Post.topic))\
         .filter(models.Post.user_id == current_user.id)\
-            .order_by(models.Post.created_at.desc())\
+            .order_by(models.Post.created_at.desc(), models.Post.id.desc())\
                 .all()
                 
     avg_score = db.query(func.avg(models.Post.sentiment_score))\
@@ -25,7 +26,7 @@ def get_dashboard(
     return schemas.DashboardResponse(
         email = current_user.email,
         total_posts = len(posts),
-        avg_sentiment = round(avg_score, 1) if avg_score else None,
+        avg_sentiment = round(avg_score, 1) if avg_score is not None else None,
         posts = [schemas.DashboardPost(
             id=p.id,
             content=p.content, 
@@ -33,4 +34,3 @@ def get_dashboard(
             topic_name=p.topic.name,
             created_at=p.created_at
         ) for p in posts])
-     

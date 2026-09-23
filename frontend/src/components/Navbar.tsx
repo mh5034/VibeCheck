@@ -22,7 +22,7 @@ export default function Navbar() {
           onClick={() => navigate("/topics")}
           className="text-gray-300 hover:text-white text-sm"
         >
-          Topics
+          Explore Vibes
         </button>
         <button
           onClick={() =>

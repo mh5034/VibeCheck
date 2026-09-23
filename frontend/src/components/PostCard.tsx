@@ -19,10 +19,9 @@ function getSentimentEmoji(score: number | null) {
 
 type PostCardProps = {
   post: Post;
-  onDelete: (postId: number) => void;
 };
 
-export default function PostCard({ post, onDelete }: PostCardProps) {
+export default function PostCard({ post }: PostCardProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -34,8 +33,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
     try {
       await deletePost(post.id);
       setShowDialog(false);
-      onDelete(post.id);
-    } catch (error) {
+    } catch {
       setError("Could not delete post. Make sure you are the author.");
     } finally {
       setDeleting(false);

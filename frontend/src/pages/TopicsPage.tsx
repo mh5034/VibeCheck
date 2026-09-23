@@ -1,34 +1,22 @@
-import { Topic } from "@/api/client";
-import { useEffect, useState } from "react";
-import { getTopics } from "@/api/client";
+import { useState } from "react";
+import { topicsResource } from "@/api/client";
+import { useResource } from "../hooks/useResource";
 import TopicCard from "@/components/TopicCard";
 import { useNavigate } from "react-router-dom";
 
 export default function Topics() {
   const navigate = useNavigate();
-  const [topics, setTopics] = useState<Topic[]>([]);
+  const {
+    data: topics = [],
+    error,
+    loading,
+    retry,
+  } = useResource(topicsResource);
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredTopics = topics.filter((topic) =>
     topic.name.toLowerCase().includes(normalizedQuery),
   );
-
-  useEffect(() => {
-    loadTopics();
-  }, [topics]);
-
-  async function loadTopics() {
-    try {
-      const data = await getTopics();
-      setTopics(data); // Show all topics
-    } catch {
-      setError("Failed to load topics");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gray-950 px-4 py-8">
@@ -41,7 +29,7 @@ export default function Topics() {
         </button>
         <div className="flex justify-between">
           <span className="text-2xl font-bold text-white mb-6">
-            Explore topics
+            Explore Vibes
           </span>
           <span>
             <input
@@ -70,9 +58,15 @@ export default function Topics() {
         </div>
 
         {/* Error */}
-        {error && (
-          <div className="bg-red-500/20 text-red-400 rounded-lg p-3 mb-4 text-sm">
-            {error}
+        {!!error && (
+          <div
+            role="alert"
+            className="bg-red-500/20 text-red-400 rounded-lg p-3 mb-4 text-sm"
+          >
+            Failed to load topics.{" "}
+            <button onClick={retry} className="underline">
+              Retry
+            </button>
           </div>
         )}
 

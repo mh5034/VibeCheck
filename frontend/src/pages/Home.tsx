@@ -1,31 +1,23 @@
-import { useEffect, useState } from "react";
-import { type Topic, createTopic, getTopics } from "../api/client.ts";
+import { useState } from "react";
+import { isAxiosError } from "axios";
+import { createTopic, topicsResource } from "../api/client.ts";
+import { useResource } from "../hooks/useResource";
 import { useAuth } from "../context/AuthContext.tsx";
 import TopicCard from "../components/TopicCard";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function () {
-  const [topics, setTopics] = useState<Topic[]>([]);
+export default function Home() {
+  const {
+    data,
+    loading,
+    error: loadError,
+    retry,
+  } = useResource(topicsResource);
+  const topics = (data ?? []).slice(0, 5);
   const [newTopic, setNewTopic] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    loadTopics();
-  }, [topics]);
-
-  async function loadTopics() {
-    try {
-      const data = await getTopics();
-      setTopics(data.slice(0, 5)); // Show only the first 5 topics
-    } catch {
-      setError("Failed to load topics");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleCreateTopic() {
     if (!isLoggedIn) {
@@ -34,11 +26,14 @@ export default function () {
     }
     if (!newTopic.trim()) return;
     try {
-      const topic = await createTopic(newTopic.trim());
-      setTopics([...topics, topic]);
+      await createTopic(newTopic.trim());
       setNewTopic("");
-    } catch (e: any) {
-      setError(e.response?.data?.detail || "Failed to create topic");
+    } catch (e: unknown) {
+      setError(
+        isAxiosError(e)
+          ? e.response?.data?.detail || "Failed to create topic"
+          : "Failed to create topic",
+      );
     }
   }
 
@@ -88,6 +83,14 @@ export default function () {
         )}
 
         {/* Error */}
+        {!!loadError && (
+          <div role="alert" className="text-red-400 mb-4">
+            Failed to load topics.{" "}
+            <button onClick={retry} className="underline">
+              Retry
+            </button>
+          </div>
+        )}
         {error && (
           <div className="bg-red-500/20 text-red-400 rounded-lg p-3 mb-4 text-sm">
             {error}
@@ -97,7 +100,7 @@ export default function () {
         {/* Topics List */}
         <div id="topic-results" aria-busy={loading}>
           <div className="flex justify-between mb-2">
-            <span className="text-white font-semibold">🔥 Trending vibes</span>
+            <span className="text-white font-semibold">🔥 Trending Vibes</span>
             <span className="text-gray-300 hover:text-white text-sm">
               <button
                 onClick={() => {
