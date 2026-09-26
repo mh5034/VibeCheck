@@ -178,7 +178,7 @@ export default function Auth() {
             disabled={loading}
             className="w-full bg-purple-600 hover:bg-purple-500 active:bg-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition mt-2"
           >
-            {loading ? "Loading..." : isLogin ? "Login" : "Register"}
+            {loading ? "Loading..." : isLogin ? "Log In" : "Register"}
           </button>
         </div>
 
@@ -189,7 +189,7 @@ export default function Auth() {
             onClick={handleSwitch}
             className="text-purple-400 hover:underline"
           >
-            {isLogin ? "Register" : "Login"}
+            {isLogin ? "Register" : "Log In"}
           </button>
         </p>
       </div>

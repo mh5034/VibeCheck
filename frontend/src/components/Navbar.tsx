@@ -22,7 +22,7 @@ export default function Navbar() {
           onClick={() => navigate("/topics")}
           className="text-gray-300 hover:text-white text-sm"
         >
-          Explore Vibes
+          Explore
         </button>
         <button
           onClick={() =>
@@ -39,7 +39,7 @@ export default function Navbar() {
               onClick={handleLogout}
               className="bg-red-950/40 text-red-400 border border-red-900/50 hover:bg-red-600 hover:text-white active:bg-red-700 px-4 py-2 rounded-lg text-sm transition-all duration-200"
             >
-              Logout
+              Log Out
             </Button>
           </div>
         ) : (
@@ -47,7 +47,7 @@ export default function Navbar() {
             render={<Link to="/auth" />}
             className="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 px-4 py-2 rounded-lg text-sm"
           >
-            Login
+            Log In
           </Button>
         )}
       </div>

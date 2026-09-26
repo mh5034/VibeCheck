@@ -2,6 +2,7 @@ import axios from "axios";
 import { createResource } from "./resource";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+export const AUTH_EXPIRED_EVENT = "auth:expired";
 
 // Create axios instance
 const api = axios.create({
@@ -22,10 +23,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   response => response, //success
   error => {
-    if (error.response?.token === 401){
-      // token exprired or invalid
+    if (error.response?.status === 401 && localStorage.getItem("token")) {
       localStorage.removeItem("token")
-      window.location.href = "/auth"
+      window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
     }
     return Promise.reject(error)
   }

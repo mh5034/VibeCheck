@@ -75,7 +75,7 @@ export default function Home() {
           >
             <span className="text-slate-400">
               <span className="text-purple-500 font-semibold group-hover:underline">
-                Login
+                Log in
               </span>{" "}
               to create a topic
             </span>
