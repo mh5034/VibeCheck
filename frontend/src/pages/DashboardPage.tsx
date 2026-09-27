@@ -68,7 +68,7 @@ export default function DashboardPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center text-gray-400">
+      <div className="min-h-screen bg-linear-to-br from-violet-950 to-black flex items-center justify-center text-gray-400">
         Loading...
       </div>
     );

@@ -57,7 +57,7 @@ export default function Topic() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center text-gray-400">
+      <div className="min-h-screen bg-linear-to-br from-violet-950 to-black flex items-center justify-center text-gray-400">
         Loading...
       </div>
     );
@@ -141,7 +141,7 @@ export default function Topic() {
           <Link
             to="/auth"
             state={{ from: location }}
-            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-950 border border-purple-800 transition-colors duration-200 hover:bg-slate-800/80 group mb-6"
+            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-950 border border-purple-800/60 transition-colors duration-200 hover:border-purple-700 group mb-6"
           >
             <span className="text-slate-400">
               <span className="text-purple-500 font-semibold group-hover:underline">
