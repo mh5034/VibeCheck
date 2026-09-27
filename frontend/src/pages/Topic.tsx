@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import { isAxiosError } from "axios";
-import { createPost, getTopicResource, Post } from "../api/client";
+import { createPost, getTopicResource } from "../api/client";
 import { useResource } from "../hooks/useResource";
 import PostCard from "../components/PostCard";
 
@@ -35,9 +35,6 @@ export default function Topic() {
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState("");
   const charLimit = 280;
-
-  const [activeDeletePost, setActiveDeletePost] = useState<Post | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   async function handlePost() {
     if (!newPost.trim() || !id || posting) return;
