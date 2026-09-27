@@ -44,7 +44,7 @@ function AppContent() {
       {sessionExpired && (
         <div
           role="alert"
-          className="flex flex-wrap items-center justify-center gap-3 border-b border-purple-400/30 bg-slate-900 px-4 py-3 text-sm text-gray-300"
+          className="flex flex-wrap items-center justify-center gap-3 border-b border-purple-400/30 bg-slate-950 px-4 py-1 text-sm text-gray-300"
         >
           <p>
             Your session has expired. You can still browse topics and posts

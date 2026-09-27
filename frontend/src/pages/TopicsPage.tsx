@@ -19,7 +19,7 @@ export default function Topics() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-950 px-4 py-8">
+    <div className="min-h-screen bg-linear-to-br from-violet-950 to-black px-4 py-8">
       <div className="max-w-2xl mx-auto">
         <button
           onClick={() => navigate(-1)}
@@ -42,13 +42,13 @@ export default function Topics() {
               }}
               placeholder="🔍 Search topics..."
               aria-controls="topic-results"
-              className="text-sm min-w-0 flex-1 bg-slate-900 border border-slate-800 text-white rounded-xl px-4 py-1 outline-none focus:ring-2 focus:ring-purple-500"
+              className="text-sm min-w-0 flex-1 bg-slate-950 border border-purple-800 text-white rounded-xl px-4 py-1 outline-none focus:ring-2 focus:ring-purple-500"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="text-sm text-gray-300 ml-2 hover:text-white bg-slate-800 rounded-xl px-4 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                className="text-sm text-gray-300 ml-2 hover:text-white bg-slate-950 border border-purple-800 rounded-xl px-4 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
                 aria-label="Clear topic search"
               >
                 Clear

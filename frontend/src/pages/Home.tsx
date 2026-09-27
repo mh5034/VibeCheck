@@ -38,14 +38,14 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 px-4 py-8">
+    <div className="min-h-screen bg-linear-to-br from-violet-950 to-black px-4 py-8">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center mt-12">
           <h1 className="text-5xl font-bold text-white mb-1 tracking-tight">
             What's the vibe?
           </h1>
-          <p className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
             See what the community thinks. Share your thoughts and track the
             internet's pulse in real-time.
           </p>
@@ -59,11 +59,11 @@ export default function Home() {
               onChange={(e) => setNewTopic(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreateTopic()}
               placeholder="Start a new topic..."
-              className="flex-1 bg-slate-900 border border-slate-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 bg-slate-950 border border-purple-800/60 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button
               onClick={handleCreateTopic}
-              className="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+              className="bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white px-6 py-3 rounded-xl font-semibold transition"
             >
               Post topic
             </button>
@@ -71,7 +71,7 @@ export default function Home() {
         ) : (
           <Link
             to="/auth"
-            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80 group mb-8"
+            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-950 border border-purple-800/60 transition-colors duration-200 hover:border-purple-700 group mb-8"
           >
             <span className="text-slate-400">
               <span className="text-purple-500 font-semibold group-hover:underline">

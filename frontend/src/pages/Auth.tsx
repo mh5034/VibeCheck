@@ -92,8 +92,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-linear-to-br from-violet-950 to-black flex items-center justify-center px-4">
+      <div className="bg-slate-950 border border-purple-800/60 rounded-2xl p-8 w-full max-w-md">
         <h1 className="text-white text-2xl font-bold text-center mb-6">
           {isLogin ? "Welcome back 👋" : "Join VibeCheck ✨"}
         </h1>
@@ -110,11 +110,11 @@ export default function Auth() {
                 if (errors.email)
                   setErrors((prev) => ({ ...prev, email: undefined }));
               }}
-              className={`w-full bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 transition
+              className={`w-full bg-gray-800 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 transition
               ${errors.email ? "ring-2 ring-red-500" : "focus:ring-purple-500"}`}
             />
             {errors.email && (
-              <p className="text-red-400 text-xs mt-4 ml-1">{errors.email}</p>
+              <p className="text-red-400 text-xs mt-2 ml-1">{errors.email}</p>
             )}
           </div>
 
@@ -130,11 +130,11 @@ export default function Auth() {
                   setErrors((prev) => ({ ...prev, password: undefined }));
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              className={`w-full bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 transition
+              className={`w-full bg-gray-800 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 transition
               ${errors.password ? "ring-2 ring-red-500" : "focus:ring-purple-500"}`}
             />
             {errors.password && (
-              <p className="text-red-400 text-xs mt-4 ml-1">
+              <p className="text-red-400 text-xs mt-2 ml-1">
                 {errors.password}
               </p>
             )}
@@ -156,7 +156,7 @@ export default function Auth() {
                     }));
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                className={`w-full bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 transition
+                className={`w-full bg-gray-800 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 transition
                 ${errors.confirmPassword ? "ring-2 ring-red-500" : "focus:ring-purple-500"}`}
               />
               {errors.confirmPassword && (
@@ -176,7 +176,7 @@ export default function Auth() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-500 active:bg-purple-700 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition mt-2"
+            className="w-full bg-purple-700 hover:bg-purple-600 active:bg-purple-800 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition mt-2"
           >
             {loading ? "Loading..." : isLogin ? "Log In" : "Register"}
           </button>

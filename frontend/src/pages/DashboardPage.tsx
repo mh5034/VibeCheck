@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import DeleteDialog from "@/components/DeleteDialog";
 import { useNavigate } from "react-router-dom";
 import {
   deletePost,
@@ -15,7 +8,6 @@ import {
   type Post,
 } from "../api/client";
 import { useAuth } from "../context/AuthContext";
-import { Button } from "@/components/ui/button";
 
 function getSentimentEmoji(score: number | null) {
   if (score === null) return "💬";
@@ -85,7 +77,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-950 px-4 py-8">
+      <div className="min-h-screen bg-linear-to-br from-violet-950 to-black px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={() => navigate(-1)}
@@ -94,18 +86,18 @@ export default function DashboardPage() {
             ← Back
           </button>
           {/* Header Banner */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6">
+          <div className="bg-slate-950 border border-purple-800/60 rounded-2xl p-6 mb-6">
             <h1 className="text-white text-2xl font-bold mb-4">My Dashboard</h1>
 
             {/* Stats Metrics Grid */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
+              <div className="bg-slate-950 border border-purple-800/60 rounded-xl p-4 text-center">
                 <p className="text-3xl font-bold text-white">
                   {dashboard.total_posts}
                 </p>
                 <p className="text-gray-400 text-sm mt-1">Total Vibes</p>
               </div>
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
+              <div className="bg-slate-950 border border-purple-800/60 rounded-xl p-4 text-center">
                 <p className="text-3xl font-bold text-purple-400">
                   {dashboard.avg_sentiment ?? "N/A"}
                 </p>
@@ -126,34 +118,32 @@ export default function DashboardPage() {
               dashboard.posts.map((postItem) => (
                 <div
                   key={postItem.id}
-                  className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex gap-3"
+                  className="bg-slate-950 border border-purple-800/60 rounded-xl p-3 flex gap-3"
                 >
                   <span className="text-2xl">
                     {getSentimentEmoji(postItem.sentiment_score)}
                   </span>
-                  <div className="flex-1">
+                  <div className="flex flex-col justify-between">
                     <p className="text-purple-400 text-xs font-semibold mb-1">
                       #{postItem.topic_name}
                     </p>
-                    <div className="flex justify-between">
-                      <p className="text-white text-sm">{postItem.content}</p>
-                      <button
-                        onClick={() => setActiveDeletePost(postItem)}
-                        className="text-gray-500 hover:text-red-400 text-xs transition-colors duration-200 ml-2"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                    <div className="flex justify-between mt-2">
+                    <p className="text-white text-sm">{postItem.content}</p>
+                    <span className="text-gray-500 text-xs mt-2">
+                      {new Date(postItem.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-between shrink-0 mt-4 ml-auto">
+                    <button
+                      onClick={() => setActiveDeletePost(postItem)}
+                      className="bg-red-950/40 text-red-400 border border-red-900/50 hover:bg-red-600 hover:text-white active:bg-red-700 rounded-xl text-xs transition-colors duration-200 mt-2"
+                    >
+                      Delete
+                    </button>
+                    {postItem.sentiment_score !== null && (
                       <span className="text-gray-500 text-xs">
-                        {new Date(postItem.created_at).toLocaleDateString()}
+                        vibe: {postItem.sentiment_score}/100
                       </span>
-                      {postItem.sentiment_score !== null && (
-                        <span className="text-gray-400 text-xs">
-                          vibe: {postItem.sentiment_score}/100
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
               ))
@@ -163,49 +153,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Confirm Delete Dialog */}
-      <Dialog
-        open={activeDeletePost !== null}
-        onOpenChange={(open) => !open && setActiveDeletePost(null)}
-      >
-        <DialogContent className="bg-gray-800 border-gray-700 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-white">Delete this vibe?</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-
-          {/* Dynamic Post Content Preview */}
-          {activeDeletePost && (
-            <div className="bg-gray-700 rounded-lg p-3 my-2 border border-gray-600">
-              <p className="text-gray-300 text-sm">
-                {activeDeletePost.content}
-              </p>
-            </div>
-          )}
-
-          {error && <p className="text-red-400 text-sm font-medium">{error}</p>}
-
-          <DialogFooter className="gap-2 bg-gray-800 border-gray-700">
-            <Button
-              variant="outline"
-              onClick={() => setActiveDeletePost(null)}
-              disabled={deleting}
-              className="text-slate-900 dark:text-slate-100 border-gray-600 hover:bg-gray-700"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              className="bg-red-600 text-white hover:bg-red-700"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
-              {deleting ? "Deleting..." : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteDialog
+        activeDeletePost={activeDeletePost}
+        setActiveDeletePost={setActiveDeletePost}
+        handleDelete={handleDelete}
+        deleting={deleting}
+        error={error}
+      />
     </>
   );
 }

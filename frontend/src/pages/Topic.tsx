@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import { isAxiosError } from "axios";
-import { createPost, getTopicResource } from "../api/client";
+import { createPost, getTopicResource, Post } from "../api/client";
 import { useResource } from "../hooks/useResource";
 import PostCard from "../components/PostCard";
 
@@ -35,6 +35,9 @@ export default function Topic() {
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState("");
   const charLimit = 280;
+
+  const [activeDeletePost, setActiveDeletePost] = useState<Post | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function handlePost() {
     if (!newPost.trim() || !id || posting) return;
@@ -77,7 +80,7 @@ export default function Topic() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-950 px-4 py-8">
+    <div className="min-h-screen bg-linear-to-br from-violet-950 to-black px-4 py-8">
       <div className="max-w-2xl mx-auto">
         {/* Back button */}
         <button
@@ -88,7 +91,7 @@ export default function Topic() {
         </button>
 
         {/* Topic Header */}
-        <div className="w-full rounded-xl bg-slate-900 border border-slate-800 p-6 mb-6">
+        <div className="w-full rounded-xl bg-slate-950 border border-purple-800 p-6 mb-6">
           <h1 className="text-white text-2xl font-bold mb-1">#{topic.name}</h1>
           {/* Vibe Score */}
           {topic.vibe_score !== null && (
@@ -115,7 +118,7 @@ export default function Topic() {
 
         {/* Post Input */}
         {isLoggedIn ? (
-          <div className="flex flex-col gap-3 bg-slate-900 border border-slate-800 rounded-xl p-4 mb-6 transition-all focus-within:ring-2 focus-within:ring-purple-500">
+          <div className="flex flex-col gap-3 bg-slate-950 border border-purple-800 rounded-xl p-4 mb-6 transition-all focus-within:ring-2 focus-within:ring-purple-500">
             <textarea
               value={newPost}
               onChange={(e) => setNewPost(e.target.value.slice(0, charLimit))}
@@ -131,7 +134,7 @@ export default function Topic() {
               <button
                 onClick={handlePost}
                 disabled={posting || !newPost.trim()}
-                className="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 disabled:opacity-40 disabled:pointer-events-none text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-md shadow-purple-950/10"
+                className="bg-purple-700 hover:bg-purple-600 active:bg-purple-800 disabled:opacity-40 disabled:pointer-events-none text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-md shadow-purple-950/10"
               >
                 {posting ? "Posting..." : "Post Vibe"}
               </button>
@@ -141,7 +144,7 @@ export default function Topic() {
           <Link
             to="/auth"
             state={{ from: location }}
-            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80 group mb-6"
+            className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-950 border border-purple-800 transition-colors duration-200 hover:bg-slate-800/80 group mb-6"
           >
             <span className="text-slate-400">
               <span className="text-purple-500 font-semibold group-hover:underline">
@@ -174,9 +177,7 @@ export default function Topic() {
               No vibes yet — be the first! 👆
             </div>
           ) : (
-            topic.posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))
+            topic.posts.map((post) => <PostCard key={post.id} post={post} />)
           )}
         </div>
       </div>

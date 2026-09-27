@@ -13,7 +13,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+    <nav className="bg-slate-950 border-b border-purple-400/30 text-white px-6 py-1 flex justify-between items-center sticky top-0 z-10">
       <Link to="/" className="text-xl font-bold text-purple-400">
         <img src={logo} alt="VibeCheck" className="h-10 w-auto" />
       </Link>

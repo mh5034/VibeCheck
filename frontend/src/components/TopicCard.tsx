@@ -18,7 +18,7 @@ function getVibeEmoji(score: number | null) {
 export default function TopicCard({ topic }: { topic: Topic }) {
   return (
     <Link to={`/topic/${topic.id}`}>
-      <div className="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80">
+      <div className="w-full p-3 rounded-xl bg-slate-950 border border-purple-800/60 transition-colors duration-200 hover:border-purple-700">
         <div className="flex justify-between items-center">
           <h2 className="text-white font-semibold text-lg ml-1">
             #{topic.name}
