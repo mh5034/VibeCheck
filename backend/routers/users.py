@@ -29,9 +29,15 @@ def get_dashboard(
         avg_sentiment = round(avg_score, 1) if avg_score is not None else None,
         posts = [schemas.DashboardPost(
             id=p.id,
+            user_id=p.user_id,
             content=p.content, 
             sentiment_score=p.sentiment_score,
             topic_id=p.topic_id,
             topic_name=p.topic.name,
             created_at=p.created_at
         ) for p in posts])
+
+
+@router.get("/identity")
+def get_identity(current_user: models.User = Depends(get_current_user)):
+    return {"id": current_user.id}

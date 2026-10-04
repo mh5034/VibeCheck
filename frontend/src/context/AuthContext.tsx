@@ -1,12 +1,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import {
   AUTH_EXPIRED_EVENT,
+  getIdentity,
   login as apiLogin,
   register as apiRegister,
 } from "../api/client.ts";
 
 type AuthContextType = {
   token: string | null;
+  userId: number | null;
   isLoggedIn: boolean;
   sessionExpired: boolean;
   dismissSessionExpired: () => void;
@@ -22,6 +24,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token"), // persist across refresh
   );
+
+  const [identity, setIdentity] = useState<{ token: string; id: number } | null>(null);
+  const userId = token && identity?.token === token ? identity.id : null;
+
+  useEffect(() => {
+    if (!token) return;
+    let active = true;
+    getIdentity().then(({ id }) => {
+      if (active) setIdentity({ token, id });
+    }).catch(() => {
+      if (active) setIdentity(null);
+    });
+    return () => { active = false; };
+  }, [token]);
 
   useEffect(() => {
     const expireSession = () => {
@@ -84,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         token,
+        userId,
         isLoggedIn: !!token,
         sessionExpired,
         dismissSessionExpired: () => setSessionExpired(false),

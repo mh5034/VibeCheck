@@ -94,7 +94,9 @@ export default function Topic() {
 
         {/* Topic Header */}
         <div className="w-full rounded-xl bg-slate-950 border border-purple-800 p-6 mb-6">
-          <h1 className="text-white text-2xl font-bold mb-1 wrap-anywhere">#{topic.name}</h1>
+          <h1 className="text-white text-2xl font-bold mb-1 wrap-anywhere">
+            #{topic.name}
+          </h1>
           {/* Vibe Score */}
           {topic.vibe_score !== null && (
             <div className="mt-3">
@@ -158,7 +160,7 @@ export default function Topic() {
           >
             <span className="text-slate-400">
               <span className="text-purple-300 font-semibold group-hover:underline">
-                Login
+                Log in
               </span>{" "}
               to post your vibe
             </span>

@@ -85,6 +85,7 @@ def get_topic_posts(topic_id: int, db: Session = Depends(get_db)):
         summary=topic.ai_summary,
         posts=[schemas.PostResponse(
             id=p.id,
+            user_id=p.user_id,
             content=p.content,
             sentiment_score=p.sentiment_score,
             created_at=p.created_at
@@ -178,3 +179,33 @@ def delete_post(
     db.commit()
     
     return None
+
+
+@router.patch("/posts/{post_id}", response_model=schemas.PostResponse)
+def update_post(
+    post_id: int,
+    request: schemas.PostUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    if post.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You are not authorized to edit this post")
+    if post.content == request.content:
+        return post
+
+    post.content = request.content
+    post.sentiment_score = get_sentiment(request.content)
+    db.flush()
+    recent_posts = (db.query(models.Post)
+        .filter(models.Post.topic_id == post.topic_id)
+        .order_by(models.Post.created_at.desc(), models.Post.id.desc())
+        .limit(20).all())
+    topic = db.query(models.Topic).filter(models.Topic.id == post.topic_id).one()
+    topic.ai_summary = get_topic_summary([p.content for p in recent_posts])["summary"]
+    topic.ai_vibe_score = get_topic_score([p.sentiment_score for p in recent_posts])
+    db.commit()
+    db.refresh(post)
+    return post

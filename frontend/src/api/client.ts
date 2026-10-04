@@ -42,6 +42,7 @@ export type Topic = {
 
 export type Post = {
   id: number;
+  user_id: number;
   content: string;
   sentiment_score: number | null;
   created_at: string;
@@ -57,6 +58,7 @@ export type TopicDetail = {
 
 export type DashboardPost = {
   id: number;
+  user_id: number;
   content: string;
   sentiment_score: number | null;
   topic_id: number;
@@ -143,6 +145,24 @@ export const deletePost = async (postId: number): Promise<void> => {
     resource.invalidate();
   }
   topicsResource.invalidate();
+};
+
+export const getIdentity = async (): Promise<{ id: number }> => {
+  const res = await api.get("/users/identity");
+  return res.data;
+};
+
+export const updatePost = async (postId: number, content: string): Promise<Post> => {
+  const { data } = await api.patch<Post>(`/topics/posts/${postId}`, { content });
+  for (const resource of topicResources.values()) {
+    resource.update((topic) => ({
+      ...topic,
+      posts: topic.posts.map((post) => post.id === postId ? data : post),
+    }));
+    resource.invalidate();
+  }
+  topicsResource.invalidate();
+  return data;
 };
 
 // Dashboard

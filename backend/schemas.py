@@ -51,8 +51,20 @@ class TopicDetailResponse(BaseModel):
 class PostCreate(BaseModel):
     content: str
     
+class PostUpdate(BaseModel):
+    content: str
+
+    @field_validator("content")
+    @classmethod
+    def validate_content(cls, value):
+        value = value.strip()
+        if not value or len(value) > 280:
+            raise ValueError("Post must contain 1 to 280 characters")
+        return value
+
 class PostResponse(BaseModel):
     id: int
+    user_id: int
     content: str
     sentiment_score: Optional[float] = None
     created_at: datetime
@@ -63,6 +75,7 @@ class PostResponse(BaseModel):
 # Dashboard
 class DashboardPost(BaseModel):
     id: int
+    user_id: int
     content: str
     sentiment_score: Optional[float] = None
     topic_id: int

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getDashboard,
   type Dashboard,
+  type Post,
 } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 
@@ -13,10 +14,12 @@ export default function DashboardPage() {
   const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleDeleted = (postId: number) => {
+  const updateDashboard = (postId: number, updated?: Post) => {
     setDashboard((current) => {
       if (!current) return current;
-      const posts = current.posts.filter((post) => post.id !== postId);
+      const posts = updated
+        ? current.posts.map((post) => post.id === postId ? { ...post, ...updated } : post)
+        : current.posts.filter((post) => post.id !== postId);
       const scores = posts.flatMap((post) => post.sentiment_score === null ? [] : [post.sentiment_score]);
       return {
         ...current,
@@ -99,7 +102,8 @@ export default function DashboardPage() {
                   key={postItem.id}
                   post={postItem}
                   topic={{ id: postItem.topic_id, name: postItem.topic_name }}
-                  onDeleted={handleDeleted}
+                  onDeleted={(id) => updateDashboard(id)}
+                  onUpdated={(post) => updateDashboard(post.id, post)}
                 />
               ))
             )}

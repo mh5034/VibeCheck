@@ -16,7 +16,7 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
 import models
 import schemas
-from routers.topics import get_topics, get_topic_posts, create_post, delete_post
+from routers.topics import get_topics, get_topic_posts, create_post, delete_post, update_post
 from routers.users import get_dashboard
 
 
@@ -129,6 +129,57 @@ class TopicQueryTests(unittest.TestCase):
             create_post(topic.id, schemas.PostCreate(content="New"), self.db, user)
             self.assertEqual(float(topic.ai_vibe_score), 80)
             self.assertEqual(len(summary.call_args.args[0]), 20)
+
+    def test_author_can_edit_and_refresh_sentiment_and_topic(self):
+        user = self.db.get(models.User, self.user_id)
+        post = self.db.query(models.Post).first()
+        created_at = post.created_at
+        with patch("routers.topics.get_sentiment", return_value=90), patch(
+            "routers.topics.get_topic_summary", return_value={"summary": "Positive"}
+        ):
+            result = update_post(post.id, schemas.PostUpdate(content="  Love it!  "), self.db, user)
+        self.assertEqual(result.content, "Love it!")
+        self.assertEqual(result.sentiment_score, 90)
+        self.assertEqual(result.created_at, created_at)
+        self.assertEqual(result.topic.ai_summary, "Positive")
+        self.assertEqual(float(result.topic.ai_vibe_score), 90)
+        self.assertEqual(schemas.PostResponse.model_validate(result).user_id, user.id)
+
+    def test_non_author_cannot_edit_or_delete(self):
+        other = models.User(email="other@example.com", password="unused")
+        self.db.add(other)
+        self.db.commit()
+        post = self.db.query(models.Post).first()
+        original = post.content
+        with patch("routers.topics.get_sentiment") as analyze:
+            with self.assertRaises(HTTPException) as caught:
+                update_post(post.id, schemas.PostUpdate(content="Changed"), self.db, other)
+            self.assertEqual(caught.exception.status_code, 403)
+            with self.assertRaises(HTTPException) as caught:
+                delete_post(post.id, self.db, other)
+            self.assertEqual(caught.exception.status_code, 403)
+            analyze.assert_not_called()
+        self.assertEqual(post.content, original)
+
+    def test_missing_edit_and_invalid_content(self):
+        from pydantic import ValidationError
+        user = self.db.get(models.User, self.user_id)
+        with self.assertRaises(HTTPException) as caught:
+            update_post(99999, schemas.PostUpdate(content="Changed"), self.db, user)
+        self.assertEqual(caught.exception.status_code, 404)
+        for content in ["", "   ", "x" * 281]:
+            with self.assertRaises(ValidationError):
+                schemas.PostUpdate(content=content)
+
+    def test_edit_handles_unavailable_sentiment(self):
+        user = self.db.get(models.User, self.user_id)
+        post = self.db.query(models.Post).first()
+        with patch("routers.topics.get_sentiment", return_value=None), patch(
+            "routers.topics.get_topic_summary", return_value={"summary": None}
+        ):
+            result = update_post(post.id, schemas.PostUpdate(content="New content"), self.db, user)
+        self.assertIsNone(result.sentiment_score)
+        self.assertIsNone(result.topic.ai_vibe_score)
 
 
 if __name__ == "__main__":
