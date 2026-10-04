@@ -4,7 +4,7 @@ import schemas, models
 from sqlalchemy import func
 from database import get_db
 from auth import get_current_user
-from ai import get_sentiment, get_topic_summary
+from ai import get_sentiment, get_topic_summary, get_topic_score
 
 router = APIRouter(prefix="/topics", tags=["topics"])
 
@@ -129,7 +129,7 @@ def create_post(
     ai_result = get_topic_summary([p.content for p in recent_posts])
     
     topic.ai_summary = ai_result["summary"]
-    topic.ai_vibe_score = ai_result["score"]
+    topic.ai_vibe_score = get_topic_score([p.sentiment_score for p in recent_posts])
     
     db.commit()
     
@@ -169,7 +169,7 @@ def delete_post(
     if remaining_posts:
         ai_result = get_topic_summary([p.content for p in remaining_posts])
         topic.ai_summary = ai_result["summary"]
-        topic.ai_vibe_score = ai_result["score"]
+        topic.ai_vibe_score = get_topic_score([p.sentiment_score for p in remaining_posts])
         
     else:
         topic.ai_summary = None

@@ -1,3 +1,4 @@
+import { getSentimentEmoji } from "@/lib/sentiment";
 import { type Post, deletePost } from "../api/client";
 import {
   Dialog,
@@ -9,13 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-
-function getSentimentEmoji(score: number | null) {
-  if (score === null) return "💬";
-  if (score >= 70) return "😊";
-  if (score >= 40) return "😐";
-  return "😞";
-}
 
 type PostCardProps = {
   post: Post;
@@ -58,11 +52,9 @@ export default function PostCard({ post }: PostCardProps) {
           >
             Delete
           </button>
-          {post.sentiment_score !== null && (
-            <span className="text-gray-400 text-xs">
-              vibe: {post.sentiment_score}/100
-            </span>
-          )}
+          <span className="text-gray-400 text-xs">
+              {post.sentiment_score === null ? "Vibe unavailable" : `vibe: ${post.sentiment_score}/100`}
+          </span>
         </div>
       </div>
 

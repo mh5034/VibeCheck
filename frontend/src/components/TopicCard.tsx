@@ -1,19 +1,13 @@
+import { getSentimentEmoji, getSentimentTone } from "@/lib/sentiment";
 import { Link } from "react-router-dom";
 import { type Topic } from "../api/client";
 
-function getVibeColor(score: number | null) {
-  if (score === null) return "text-gray-400";
-  if (score >= 70) return "text-green-400";
-  if (score >= 40) return "text-yellow-400";
-  return "text-red-400";
-}
-
-function getVibeEmoji(score: number | null) {
-  if (score === null) return "🤔";
-  if (score >= 70) return "😍";
-  if (score >= 40) return "😐";
-  return "😤";
-}
+const vibeColors = {
+  unavailable: "text-gray-400",
+  positive: "text-green-400",
+  neutral: "text-yellow-400",
+  negative: "text-red-400",
+};
 
 export default function TopicCard({ topic }: { topic: Topic }) {
   return (
@@ -24,7 +18,7 @@ export default function TopicCard({ topic }: { topic: Topic }) {
             #{topic.name}
           </h2>
           <span className="text-2xl mr-1">
-            {getVibeEmoji(topic.vibe_score)}
+            {getSentimentEmoji(topic.vibe_score)}
           </span>
         </div>
         <div className="mt-2 flex justify-between items-center">
@@ -32,11 +26,11 @@ export default function TopicCard({ topic }: { topic: Topic }) {
             {topic.post_count} vibes
           </span>
           <span
-            className={`font-bold text-sm mr-1 ${getVibeColor(topic.vibe_score)}`}
+            className={`font-bold text-sm mr-1 ${vibeColors[getSentimentTone(topic.vibe_score)]}`}
           >
             {topic.vibe_score !== null
               ? `Vibe score: ${topic.vibe_score}/100`
-              : `No vibes yet`}
+              : topic.post_count === 0 ? "No vibes yet" : "Vibe unavailable"}
           </span>
         </div>
       </div>

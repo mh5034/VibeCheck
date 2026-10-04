@@ -1,3 +1,4 @@
+import { getSentimentTone } from "@/lib/sentiment";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
@@ -8,8 +9,12 @@ import PostCard from "../components/PostCard";
 
 function VibeBar({ score }: { score: number | null }) {
   if (score === null) return null;
-  const color =
-    score >= 70 ? "bg-green-500" : score >= 40 ? "bg-yellow-500" : "bg-red-500";
+  const color = {
+    unavailable: "bg-gray-500",
+    positive: "bg-green-500",
+    neutral: "bg-yellow-500",
+    negative: "bg-red-500",
+  }[getSentimentTone(score)];
   return (
     <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
       <div
@@ -100,7 +105,15 @@ export default function Topic() {
                 </span>
               </div>
               <VibeBar score={topic.vibe_score} />
+              <p className="text-gray-400 text-xs mt-2">
+                Average of scored posts among the latest 20 vibes.
+              </p>
             </div>
+          )}
+          {topic.vibe_score === null && (
+            <p className="text-gray-400 text-sm mt-3">
+              {topic.posts.length === 0 ? "No vibes yet" : "Vibe unavailable"}
+            </p>
           )}
           {/* AI Summary */}
           {topic.summary && (

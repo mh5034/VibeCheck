@@ -1,3 +1,4 @@
+import { getSentimentEmoji } from "@/lib/sentiment";
 import { useEffect, useState } from "react";
 import DeleteDialog from "@/components/DeleteDialog";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +9,6 @@ import {
   type Post,
 } from "../api/client";
 import { useAuth } from "../context/AuthContext";
-
-function getSentimentEmoji(score: number | null) {
-  if (score === null) return "💬";
-  if (score >= 70) return "😊";
-  if (score >= 40) return "😐";
-  return "😞";
-}
 
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
@@ -139,11 +133,9 @@ export default function DashboardPage() {
                     >
                       Delete
                     </button>
-                    {postItem.sentiment_score !== null && (
-                      <span className="text-gray-500 text-xs">
-                        vibe: {postItem.sentiment_score}/100
-                      </span>
-                    )}
+                    <span className="text-gray-500 text-xs">
+                        {postItem.sentiment_score === null ? "Vibe unavailable" : `vibe: ${postItem.sentiment_score}/100`}
+                    </span>
                   </div>
                 </div>
               ))

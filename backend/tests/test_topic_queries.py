@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import unittest
 from datetime import datetime
+from unittest.mock import patch
 
 # Never connect to the configured application database during these tests.
 os.environ["DATABASE_URL"] = "sqlite://"
@@ -14,7 +15,8 @@ from fastapi import HTTPException
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
 import models
-from routers.topics import get_topics, get_topic_posts
+import schemas
+from routers.topics import get_topics, get_topic_posts, create_post, delete_post
 from routers.users import get_dashboard
 
 
@@ -87,6 +89,44 @@ class TopicQueryTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as caught:
             get_topic_posts(9999, self.db)
         self.assertEqual(caught.exception.status_code, 404)
+
+
+    def test_create_and_delete_use_post_scores_even_when_summary_fails(self):
+        user = self.db.get(models.User, self.user_id)
+        topic = models.Topic(name="Scoring")
+        self.db.add(topic)
+        self.db.flush()
+        self.db.add(models.Post(content="Bad", sentiment_score=20,
+                                topic_id=topic.id, user_id=user.id))
+        self.db.commit()
+        with patch("routers.topics.get_sentiment", return_value=90), patch(
+            "routers.topics.get_topic_summary", return_value={"summary": None}
+        ):
+            post = create_post(topic.id, schemas.PostCreate(content="Love it"), self.db, user)
+            self.assertEqual(float(topic.ai_vibe_score), 55)
+            delete_post(post.id, self.db, user)
+            self.assertEqual(float(topic.ai_vibe_score), 20)
+            last = self.db.query(models.Post).filter_by(topic_id=topic.id).one()
+            delete_post(last.id, self.db, user)
+            self.assertIsNone(topic.ai_vibe_score)
+            self.assertIsNone(topic.ai_summary)
+
+    def test_topic_average_only_uses_latest_twenty_posts(self):
+        user = self.db.get(models.User, self.user_id)
+        topic = models.Topic(name="Recent scoring")
+        self.db.add(topic)
+        self.db.flush()
+        for i in range(21):
+            self.db.add(models.Post(content="Older", sentiment_score=0 if i == 0 else 80,
+                                    topic_id=topic.id, user_id=user.id,
+                                    created_at=datetime(2026, 1, 1)))
+        self.db.commit()
+        with patch("routers.topics.get_sentiment", return_value=None), patch(
+            "routers.topics.get_topic_summary", return_value={"summary": None}
+        ) as summary:
+            create_post(topic.id, schemas.PostCreate(content="New"), self.db, user)
+            self.assertEqual(float(topic.ai_vibe_score), 80)
+            self.assertEqual(len(summary.call_args.args[0]), 20)
 
 
 if __name__ == "__main__":
