@@ -6,6 +6,7 @@ import { isAxiosError } from "axios";
 import { createPost, getTopicResource } from "../api/client";
 import { useResource } from "../hooks/useResource";
 import PostCard from "../components/PostCard";
+import TopicPageSkeleton from "@/components/TopicPageSkeleton";
 
 function VibeBar({ score }: { score: number | null }) {
   if (score === null) return null;
@@ -60,12 +61,7 @@ export default function Topic() {
     }
   }
 
-  if (loading)
-    return (
-      <div className="min-h-screen bg-linear-to-br from-violet-950 to-black flex items-center justify-center text-gray-400">
-        Loading...
-      </div>
-    );
+  if (loading) return <TopicPageSkeleton />;
 
   if (!topic)
     return (

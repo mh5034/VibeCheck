@@ -5,6 +5,7 @@ import { useResource } from "../hooks/useResource";
 import { useAuth } from "../context/AuthContext.tsx";
 import TopicCard from "../components/TopicCard";
 import { Link, useNavigate } from "react-router-dom";
+import TopicCardSkeleton from "@/components/TopicCardSkeleton.tsx";
 
 export default function Home() {
   const {
@@ -112,7 +113,11 @@ export default function Home() {
             </span>
           </div>
           {loading ? (
-            <div className="text-center text-gray-400 py-20">Loading...</div>
+            <div className="flex flex-col gap-3">
+              {[...Array(5)].map((_, index) => (
+                <TopicCardSkeleton key={index} />
+              ))}
+            </div>
           ) : topics.length === 0 ? (
             <div className="text-center text-gray-400 py-20">
               No topics yet — create one! 👆

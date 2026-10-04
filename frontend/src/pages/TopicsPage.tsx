@@ -3,6 +3,7 @@ import { topicsResource } from "@/api/client";
 import { useResource } from "../hooks/useResource";
 import TopicCard from "@/components/TopicCard";
 import { useNavigate } from "react-router-dom";
+import TopicCardSkeleton from "@/components/TopicCardSkeleton";
 
 export default function Topics() {
   const navigate = useNavigate();
@@ -71,7 +72,11 @@ export default function Topics() {
         )}
 
         {loading ? (
-          <div className="text-center text-gray-400 py-20">Loading...</div>
+          <div className="flex flex-col gap-3">
+            {[...Array(5)].map((_, index) => (
+              <TopicCardSkeleton key={index} />
+            ))}
+          </div>
         ) : filteredTopics.length === 0 && searchQuery ? (
           <div className="text-center text-gray-400 py-20">
             No topics match your search — try a different keyword!

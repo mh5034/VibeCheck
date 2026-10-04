@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import PostCard from "@/components/PostCard";
 import { useNavigate } from "react-router-dom";
-import {
-  getDashboard,
-  type Dashboard,
-  type Post,
-} from "../api/client";
+import { getDashboard, type Dashboard, type Post } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import PostCardSkeleton from "@/components/PostCardSkeleton";
 
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
@@ -18,15 +15,22 @@ export default function DashboardPage() {
     setDashboard((current) => {
       if (!current) return current;
       const posts = updated
-        ? current.posts.map((post) => post.id === postId ? { ...post, ...updated } : post)
+        ? current.posts.map((post) =>
+            post.id === postId ? { ...post, ...updated } : post,
+          )
         : current.posts.filter((post) => post.id !== postId);
-      const scores = posts.flatMap((post) => post.sentiment_score === null ? [] : [post.sentiment_score]);
+      const scores = posts.flatMap((post) =>
+        post.sentiment_score === null ? [] : [post.sentiment_score],
+      );
       return {
         ...current,
         posts,
         total_posts: posts.length,
         avg_sentiment: scores.length
-          ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length * 10) / 10
+          ? Math.round(
+              (scores.reduce((sum, score) => sum + score, 0) / scores.length) *
+                10,
+            ) / 10
           : null,
       };
     });
@@ -50,8 +54,42 @@ export default function DashboardPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-linear-to-br from-violet-950 to-black flex items-center justify-center text-gray-400">
-        Loading...
+      <div className="min-h-screen bg-linear-to-br from-violet-950 to-black px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          {/* Back */}
+          <button
+            onClick={() => navigate(-1)}
+            className="text-gray-400 hover:text-white mb-6 flex items-center gap-2"
+          >
+            ← Back
+          </button>
+          {/* Dashboard header */}
+          <div className="bg-slate-950 border border-purple-800/60 rounded-2xl p-6 mb-6 animate-pulse">
+            <div className="h-7 w-40 rounded bg-slate-700 mb-4" />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="border border-purple-800/60 rounded-xl p-4">
+                <div className="h-8 w-12 rounded bg-slate-700 mx-auto mb-2" />
+                <div className="h-4 w-20 rounded bg-slate-800 mx-auto" />
+              </div>
+
+              <div className="border border-purple-800/60 rounded-xl p-4">
+                <div className="h-8 w-12 rounded bg-slate-700 mx-auto mb-2" />
+                <div className="h-4 w-24 rounded bg-slate-800 mx-auto" />
+              </div>
+            </div>
+          </div>
+
+          {/* Your Vibes heading */}
+          <div className="h-6 w-28 rounded bg-slate-700 animate-pulse mb-3" />
+
+          {/* Post cards */}
+          <div className="flex flex-col gap-3">
+            {[...Array(3)].map((_, index) => (
+              <PostCardSkeleton key={index} />
+            ))}
+          </div>
+        </div>
       </div>
     );
 
@@ -67,6 +105,7 @@ export default function DashboardPage() {
           >
             ← Back
           </button>
+
           {/* Header Banner */}
           <div className="bg-slate-950 border border-purple-800/60 rounded-2xl p-6 mb-6">
             <h1 className="text-white text-2xl font-bold mb-4">My Dashboard</h1>
@@ -110,7 +149,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
     </>
   );
 }
