@@ -2,6 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/vibecheck-logo.svg";
 import { Button } from "@/components/ui/button";
+import { UserRound, LogOut } from "lucide-react";
+import { Menu } from "@base-ui/react/menu";
 
 export default function Navbar() {
   const { isLoggedIn, logout } = useAuth();
@@ -24,24 +26,40 @@ export default function Navbar() {
         >
           Explore
         </button>
-        <button
-          onClick={() =>
-            isLoggedIn ? navigate("/dashboard") : navigate("/auth")
-          }
-          className="text-gray-300 hover:text-white text-sm"
-        >
-          My Vibes
-        </button>
 
         {isLoggedIn ? (
-          <div className="flex gap-3 items-center">
-            <Button
-              onClick={handleLogout}
-              className="bg-red-950/40 text-red-400 border border-red-900/50 hover:bg-red-600 hover:text-white active:bg-red-700 px-4 py-2 rounded-lg text-sm transition-all duration-200"
+          <>
+            <button
+              onClick={() =>
+                isLoggedIn ? navigate("/dashboard") : navigate("/auth")
+              }
+              className="text-gray-300 hover:text-white text-sm"
             >
-              Log Out
-            </Button>
-          </div>
+              My Vibes
+            </button>
+            <Menu.Root modal={false}>
+              <Menu.Trigger
+                aria-label="User menu"
+                className="flex items-center justify-center rounded-full text-slate-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+              >
+                <UserRound size={21} />
+              </Menu.Trigger>
+
+              <Menu.Portal>
+                <Menu.Positioner align="end" sideOffset={8} className="z-50">
+                  <Menu.Popup className="min-w-36 rounded-xl border border-purple-800/60 bg-slate-950 p-1 shadow-lg outline-none">
+                    <Menu.Item
+                      onClick={handleLogout}
+                      className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-300 outline-none data-highlighted:bg-red-400/10"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
+          </>
         ) : (
           <Button
             render={<Link to="/auth" />}
