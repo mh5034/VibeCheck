@@ -15,7 +15,6 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/DashboardPage";
 import Topics from "./pages/TopicsPage";
 import { useEffect, useState } from "react";
-import { Button } from "./components/ui/button";
 import { X } from "lucide-react";
 
 export default function App() {
@@ -73,7 +72,7 @@ function AppContent() {
           <button
             disabled={demoLoading}
             onClick={handleDemoLogin}
-            className="hover:underline"
+            className={`${demoLoading ? "" : "hover:underline"}`}
           >
             {demoLoading ? "Signing in..." : "Try demo"}
           </button>
@@ -86,6 +85,8 @@ function AppContent() {
           >
             <X size={16} />
           </button>
+
+          {demoError && <span className="text-red-400">{demoError}</span>}
         </div>
       )}
 
