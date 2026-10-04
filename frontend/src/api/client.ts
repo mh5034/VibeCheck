@@ -59,6 +59,7 @@ export type DashboardPost = {
   id: number;
   content: string;
   sentiment_score: number | null;
+  topic_id: number;
   topic_name: string;
   created_at: string;
 };

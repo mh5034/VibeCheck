@@ -31,6 +31,7 @@ def get_dashboard(
             id=p.id,
             content=p.content, 
             sentiment_score=p.sentiment_score,
+            topic_id=p.topic_id,
             topic_name=p.topic.name,
             created_at=p.created_at
         ) for p in posts])

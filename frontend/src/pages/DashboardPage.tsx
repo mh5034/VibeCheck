@@ -1,12 +1,9 @@
-import { getSentimentEmoji } from "@/lib/sentiment";
 import { useEffect, useState } from "react";
-import DeleteDialog from "@/components/DeleteDialog";
+import PostCard from "@/components/PostCard";
 import { useNavigate } from "react-router-dom";
 import {
-  deletePost,
   getDashboard,
   type Dashboard,
-  type Post,
 } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 
@@ -16,32 +13,20 @@ export default function DashboardPage() {
   const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Track the specific post targeted for deletion
-  const [activeDeletePost, setActiveDeletePost] = useState<Post | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleDelete = async () => {
-    if (!activeDeletePost || !dashboard) return;
-    setDeleting(true);
-    setError("");
-
-    try {
-      await deletePost(activeDeletePost.id);
-
-      // Instantly remove the deleted post from the local UI state array
-      setDashboard({
-        ...dashboard,
-        posts: dashboard.posts.filter((p) => p.id !== activeDeletePost.id),
-        total_posts: dashboard.total_posts - 1,
-      });
-
-      setActiveDeletePost(null); // Close the dialog
-    } catch (err) {
-      setError("Could not delete post. Make sure you are the author.");
-    } finally {
-      setDeleting(false);
-    }
+  const handleDeleted = (postId: number) => {
+    setDashboard((current) => {
+      if (!current) return current;
+      const posts = current.posts.filter((post) => post.id !== postId);
+      const scores = posts.flatMap((post) => post.sentiment_score === null ? [] : [post.sentiment_score]);
+      return {
+        ...current,
+        posts,
+        total_posts: posts.length,
+        avg_sentiment: scores.length
+          ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length * 10) / 10
+          : null,
+      };
+    });
   };
 
   useEffect(() => {
@@ -110,48 +95,18 @@ export default function DashboardPage() {
               </div>
             ) : (
               dashboard.posts.map((postItem) => (
-                <div
+                <PostCard
                   key={postItem.id}
-                  className="bg-slate-950 border border-purple-800/60 rounded-xl p-3 flex gap-3"
-                >
-                  <span className="text-2xl">
-                    {getSentimentEmoji(postItem.sentiment_score)}
-                  </span>
-                  <div className="flex flex-col justify-between">
-                    <p className="text-purple-400 text-xs font-semibold mb-1">
-                      #{postItem.topic_name}
-                    </p>
-                    <p className="text-white text-sm">{postItem.content}</p>
-                    <span className="text-gray-500 text-xs mt-2">
-                      {new Date(postItem.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex flex-col justify-between shrink-0 mt-4 ml-auto">
-                    <button
-                      onClick={() => setActiveDeletePost(postItem)}
-                      className="bg-red-950/40 text-red-400 border border-red-900/50 hover:bg-red-600 hover:text-white active:bg-red-700 rounded-xl text-xs transition-colors duration-200 mt-2"
-                    >
-                      Delete
-                    </button>
-                    <span className="text-gray-500 text-xs">
-                        {postItem.sentiment_score === null ? "Vibe unavailable" : `vibe: ${postItem.sentiment_score}/100`}
-                    </span>
-                  </div>
-                </div>
+                  post={postItem}
+                  topic={{ id: postItem.topic_id, name: postItem.topic_name }}
+                  onDeleted={handleDeleted}
+                />
               ))
             )}
           </div>
         </div>
       </div>
 
-      {/* Confirm Delete Dialog */}
-      <DeleteDialog
-        activeDeletePost={activeDeletePost}
-        setActiveDeletePost={setActiveDeletePost}
-        handleDelete={handleDelete}
-        deleting={deleting}
-        error={error}
-      />
     </>
   );
 }

@@ -1,4 +1,6 @@
-import { getSentimentEmoji } from "@/lib/sentiment";
+import { Link } from "react-router-dom";
+import { Trash2 } from "lucide-react";
+import { getSentimentEmoji, getSentimentTone } from "@/lib/sentiment";
 import { type Post, deletePost } from "../api/client";
 import {
   Dialog,
@@ -13,9 +15,11 @@ import { useState } from "react";
 
 type PostCardProps = {
   post: Post;
+  topic?: { id: number; name: string };
+  onDeleted?: (postId: number) => void;
 };
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, topic, onDeleted }: PostCardProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -27,6 +31,7 @@ export default function PostCard({ post }: PostCardProps) {
     try {
       await deletePost(post.id);
       setShowDialog(false);
+      onDeleted?.(post.id);
     } catch {
       setError("Could not delete post. Make sure you are the author.");
     } finally {
@@ -35,33 +40,54 @@ export default function PostCard({ post }: PostCardProps) {
   };
   return (
     <>
-      <div className="flex gap-3 w-full p-3 rounded-xl bg-slate-950 border border-purple-800">
-        <span className="text-2xl">
-          {getSentimentEmoji(post.sentiment_score)}
-        </span>
-        <div className="flex flex-col justify-between">
-          <p className="text-white text-sm">{post.content}</p>
-          <span className="text-gray-500 text-xs mt-2">
-            {new Date(post.created_at).toLocaleDateString()}
-          </span>
-        </div>
-        <div className="flex flex-col justify-between shrink-0 mt-4 ml-auto">
+      <article className="w-full min-w-0 rounded-xl border border-purple-800/60 bg-slate-950 px-3 py-2.5">
+        <header className="flex items-start gap-2">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+            <span className={`inline-flex shrink-0 items-center gap-1.5 text-xs font-medium ${
+              {
+                positive: "text-emerald-300",
+                neutral: "text-amber-200",
+                negative: "text-rose-300",
+                unavailable: "text-slate-400",
+              }[getSentimentTone(post.sentiment_score)]
+            }`}>
+              <span className="text-lg leading-6" aria-hidden="true">
+                {getSentimentEmoji(post.sentiment_score)}
+              </span>
+              {post.sentiment_score === null ? "Vibe unavailable" : `Vibe ${post.sentiment_score}/100`}
+            </span>
+            {topic && (
+              <Link
+                to={`/topic/${topic.id}`}
+                className="min-w-0 max-w-full rounded text-xs font-medium text-purple-300 wrap-anywhere underline-offset-4 hover:text-purple-200 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+              >
+                #{topic.name}
+              </Link>
+            )}
+            <time dateTime={post.created_at} className="text-xs text-slate-500 sm:ml-auto">
+              {new Date(post.created_at).toLocaleDateString(undefined, {
+                month: "short", day: "numeric", year: "numeric",
+              })}
+            </time>
+          </div>
           <button
-            onClick={() => setShowDialog(true)}
-            className="bg-red-950/40 text-red-400 border border-red-900/50 hover:bg-red-600 hover:text-white active:bg-red-700 rounded-xl text-xs transition-colors duration-200 mt-2"
+            type="button"
+            aria-label="Delete this vibe"
+            title="Delete this vibe"
+            onClick={() => { setError(""); setShowDialog(true); }}
+            className="-my-1 inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-400/10 hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
           >
-            Delete
+            <Trash2 size={14} aria-hidden="true" />
           </button>
-          <span className="text-gray-400 text-xs">
-              {post.sentiment_score === null ? "Vibe unavailable" : `vibe: ${post.sentiment_score}/100`}
-          </span>
-        </div>
-      </div>
+        </header>
+        <p className="mt-1.5 whitespace-pre-wrap text-sm leading-5 text-slate-100 wrap-anywhere">
+          {post.content}
+        </p>
+      </article>
 
       {/* Confirm Delete Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="bg-slate-950 border border-purple-800 text-white">
-          {/* w-full p-5 rounded-xl bg-slate-900 border border-slate-800 transition-colors duration-200 hover:bg-slate-800/80 */}
           <DialogHeader>
             <DialogTitle className="text-white">Delete this vibe?</DialogTitle>
             <DialogDescription className="text-gray-400">

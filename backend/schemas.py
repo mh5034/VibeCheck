@@ -65,6 +65,7 @@ class DashboardPost(BaseModel):
     id: int
     content: str
     sentiment_score: Optional[float] = None
+    topic_id: int
     topic_name: str
     created_at: datetime
     

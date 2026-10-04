@@ -66,6 +66,8 @@ class TopicQueryTests(unittest.TestCase):
         self.assertEqual(result.total_posts, 66)
         self.assertEqual(result.avg_sentiment, 0)
         self.assertEqual(len({post.topic_name for post in result.posts}), 11)
+        for post in result.posts:
+            self.assertEqual(self.db.get(models.Topic, post.topic_id).name, post.topic_name)
 
     def test_topic_posts_are_bounded_and_ordered_when_timestamps_tie(self):
         topic = models.Topic(name="Busy")
