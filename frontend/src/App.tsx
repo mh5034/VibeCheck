@@ -14,7 +14,9 @@ import Topic from "./pages/Topic";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/DashboardPage";
 import Topics from "./pages/TopicsPage";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "./components/ui/button";
+import { X } from "lucide-react";
 
 export default function App() {
   return (
@@ -27,10 +29,14 @@ export default function App() {
 }
 
 function AppContent() {
-  const { sessionExpired, dismissSessionExpired } = useAuth();
+  const { sessionExpired, dismissSessionExpired, isLoggedIn, login } =
+    useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const hideNavbar = location.pathname === "/auth";
+  const [openDemo, setOpenDemo] = useState(true);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoError, setDemoError] = useState("");
 
   useEffect(() => {
     const goHome = () => navigate("/", { replace: true });
@@ -38,9 +44,51 @@ function AppContent() {
     return () => window.removeEventListener(AUTH_EXPIRED_EVENT, goHome);
   }, [navigate]);
 
+  const handleDemoLogin = async () => {
+    if (demoLoading) return;
+
+    setDemoLoading(true);
+    setDemoError("");
+
+    try {
+      await login("demo@vibecheck.com", "vibecheck");
+    } catch {
+      setDemoError("Demo login is currently unavailable.");
+    } finally {
+      setDemoLoading(false);
+      navigate("/");
+    }
+  };
+
   return (
     <>
       {!hideNavbar && <Navbar />}
+
+      {openDemo && !isLoggedIn && !sessionExpired && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-center gap-3 border-b border-purple-400/30 bg-slate-950 px-4 py-1 text-sm text-gray-300"
+        >
+          <p>Explore the full experience with our demo account.</p>
+          <button
+            disabled={demoLoading}
+            onClick={handleDemoLogin}
+            className="hover:underline"
+          >
+            {demoLoading ? "Signing in..." : "Try demo"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setOpenDemo(false)}
+            aria-label="Dismiss demo account message"
+            className="rounded px-1 py-1 text-gray-300 hover:bg-slate-800"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {sessionExpired && (
         <div
           role="alert"
