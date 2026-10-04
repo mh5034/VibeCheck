@@ -11,17 +11,17 @@ const vibeColors = {
 
 export default function TopicCard({ topic }: { topic: Topic }) {
   return (
-    <Link to={`/topic/${topic.id}`}>
+    <Link to={`/topic/${topic.id}`} className="block min-w-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400">
       <div className="w-full p-3 rounded-xl bg-slate-950 border border-purple-800/60 transition-colors duration-200 hover:border-purple-700">
-        <div className="flex justify-between items-center">
-          <h2 className="text-white font-semibold text-lg ml-1">
+        <div className="flex justify-between items-start gap-3">
+          <h2 className="min-w-0 wrap-anywhere text-white font-semibold text-lg ml-1">
             #{topic.name}
           </h2>
-          <span className="text-2xl mr-1">
+          <span className="shrink-0 text-2xl mr-1">
             {getSentimentEmoji(topic.vibe_score)}
           </span>
         </div>
-        <div className="mt-2 flex justify-between items-center">
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 justify-between items-center">
           <span className="text-gray-400 text-sm ml-1">
             {topic.post_count} vibes
           </span>

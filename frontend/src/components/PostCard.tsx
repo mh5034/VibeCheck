@@ -64,7 +64,7 @@ export default function PostCard({ post, topic, onDeleted }: PostCardProps) {
                 #{topic.name}
               </Link>
             )}
-            <time dateTime={post.created_at} className="text-xs text-slate-500 sm:ml-auto">
+            <time dateTime={post.created_at} className="text-xs text-slate-400 sm:ml-auto">
               {new Date(post.created_at).toLocaleDateString(undefined, {
                 month: "short", day: "numeric", year: "numeric",
               })}
@@ -107,7 +107,7 @@ export default function PostCard({ post, topic, onDeleted }: PostCardProps) {
               variant="outline"
               onClick={() => setShowDialog(false)}
               disabled={deleting}
-              className="text-slate-900 dark:text-slate-100 border-gray-600 rounded-lg hover:bg-gray-300 active:bg-gray-500"
+              className="bg-slate-950 text-slate-200 border-gray-600 rounded-lg hover:bg-slate-800 hover:text-white active:bg-slate-700"
             >
               Cancel
             </Button>

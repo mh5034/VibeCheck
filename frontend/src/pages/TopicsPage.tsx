@@ -27,11 +27,11 @@ export default function Topics() {
         >
           ← Back
         </button>
-        <div className="flex justify-between">
-          <span className="text-2xl font-bold text-white mb-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="shrink-0 text-2xl font-bold text-white">
             Explore Vibes
-          </span>
-          <span>
+          </h1>
+          <div className="flex min-w-0 gap-2 sm:max-w-xs">
             <input
               id="topic-search"
               type="search"
@@ -41,20 +41,20 @@ export default function Topics() {
                 if (e.key === "Escape") setSearchQuery("");
               }}
               placeholder="🔍 Search topics..."
-              aria-controls="topic-results"
-              className="text-sm min-w-0 flex-1 bg-slate-950 border border-purple-800 text-white rounded-xl px-4 py-1 outline-none focus:ring-2 focus:ring-purple-500"
+              aria-label="Search topics"
+              className="text-sm w-full min-w-0 flex-1 bg-slate-950 border border-purple-800 text-white rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-purple-500"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="text-sm text-gray-300 ml-2 hover:text-white bg-slate-950 border border-purple-800 rounded-xl px-4 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                className="shrink-0 text-sm text-gray-300 hover:text-white bg-slate-950 border border-purple-800 rounded-xl px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
                 aria-label="Clear topic search"
               >
                 Clear
               </button>
             )}
-          </span>
+          </div>
         </div>
 
         {/* Error */}

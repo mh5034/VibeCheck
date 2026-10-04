@@ -42,7 +42,7 @@ export default function Home() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center mt-12">
-          <h1 className="text-5xl font-bold text-white mb-1 tracking-tight">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-1 tracking-tight">
             What's the vibe?
           </h1>
           <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
@@ -53,13 +53,13 @@ export default function Home() {
 
         {/* Create Topic */}
         {isLoggedIn ? (
-          <div className="flex gap-2 mb-8">
+          <div className="flex flex-col gap-2 mb-8 sm:flex-row">
             <input
               value={newTopic}
               onChange={(e) => setNewTopic(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleCreateTopic()}
               placeholder="Start a new topic..."
-              className="flex-1 bg-slate-950 border border-purple-800/60 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
+              className="min-w-0 flex-1 bg-slate-950 border border-purple-800/60 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button
               onClick={handleCreateTopic}
@@ -74,7 +74,7 @@ export default function Home() {
             className="flex items-center justify-center w-full py-4 rounded-xl bg-slate-950 border border-purple-800/60 transition-colors duration-200 hover:border-purple-700 group mb-8"
           >
             <span className="text-slate-400">
-              <span className="text-purple-500 font-semibold group-hover:underline">
+              <span className="text-purple-300 font-semibold group-hover:underline">
                 Log in
               </span>{" "}
               to create a topic
